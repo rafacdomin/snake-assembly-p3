@@ -23,9 +23,9 @@
 	TIMER_MS                         0003         CONSTANT
 	MAX_ROWS                         0018         CONSTANT
 	MAX_COLS                         0050         CONSTANT
-	WALL_TOP                         0001         CONSTANT
-	WALL_BOTTOM                      0017         CONSTANT
-	WALL_RIGHT                       004F         CONSTANT
+	WALL_TOP                         0100         CONSTANT
+	WALL_BOTTOM                      2300         CONSTANT
+	WALL_RIGHT                       0079         CONSTANT
 	WALL_LEFT                        0000         CONSTANT
 	UP                               0000         CONSTANT
 	LEFT                             0001         CONSTANT
@@ -67,19 +67,17 @@
 	ScoreU                           87B2         VARIABLE
 	ScoreD                           87B3         VARIABLE
 	ScoreC                           87B4         VARIABLE
-	SnakeRow                         87B5         VARIABLE
-	SnakeCol                         87B6         VARIABLE
-	FoodRow                          87B7         VARIABLE
-	FoodCol                          87B8         VARIABLE
-	SnakeHead                        87B9         VARIABLE
-	SnakeTail                        87BA         VARIABLE
-	TextIndex                        87BB         VARIABLE
-	Caracter                         87BC         VARIABLE
-	LastAction                       87BD         VARIABLE
-	LinhaCursor                      87BE         VARIABLE
-	ColunaCursor                     87BF         VARIABLE
-	PosCursor                        87C0         VARIABLE
-	Random_Var                       87C1         VARIABLE
+	FoodRow                          87B5         VARIABLE
+	FoodCol                          87B6         VARIABLE
+	SnakeHead                        87B7         VARIABLE
+	SnakeTail                        87B8         VARIABLE
+	TextIndex                        87B9         VARIABLE
+	Caracter                         87BA         VARIABLE
+	LastAction                       87BB         VARIABLE
+	LinhaCursor                      87BC         VARIABLE
+	ColunaCursor                     87BD         VARIABLE
+	PosCursor                        87BE         VARIABLE
+	Random_Var                       87BF         VARIABLE
 	INT0                             FE00         VARIABLE
 	INT1                             FE01         VARIABLE
 	INT2                             FE02         VARIABLE
@@ -99,33 +97,33 @@
 	MudaLinha                        0098            LABEL
 	FimImprimeMapa                   009D            LABEL
 	MoveUp                           00A2            LABEL
-	FimMoveUp                        00CA            LABEL
-	MoveLeft                         00CE            LABEL
-	FimMoveLeft                      00F6            LABEL
-	MoveDown                         00FA            LABEL
-	FimMoveDown                      0122            LABEL
-	MoveRight                        0126            LABEL
-	FimMoveRight                     014E            LABEL
-	StartTimer                       0152            LABEL
-	PressUp                          015D            LABEL
-	FimPressUp                       0168            LABEL
-	PressLeft                        016A            LABEL
-	FimPressLeft                     0175            LABEL
-	PressDown                        0177            LABEL
-	FimPressDown                     0182            LABEL
-	PressRight                       0184            LABEL
-	FimPressRight                    018F            LABEL
-	EatFood                          0191            LABEL
-	RepeatAction                     01AA            LABEL
-	FimRepeatAction                  01C3            LABEL
-	RandomV1                         01C9            LABEL
-	Rnd_Rotate                       01D3            LABEL
-	UpdateScore                      01D7            LABEL
-	ChangeDecimal                    01E4            LABEL
-	ChangeCentesimal                 01F2            LABEL
-	PrintScore                       01F8            LABEL
-	SpawnFood                        0222            LABEL
-	GenerateFood                     0224            LABEL
-	Main                             025C            LABEL
-	Cycle                            026C            LABEL
-	Halt                             026D            LABEL
+	FimMoveUp                        00C7            LABEL
+	MoveDown                         00CB            LABEL
+	FimMoveDown                      00F0            LABEL
+	MoveLeft                         00F4            LABEL
+	FimMoveLeft                      0116            LABEL
+	MoveRight                        011A            LABEL
+	FimMoveRight                     013C            LABEL
+	StartTimer                       0140            LABEL
+	PressUp                          014B            LABEL
+	FimPressUp                       0156            LABEL
+	PressLeft                        0158            LABEL
+	FimPressLeft                     0163            LABEL
+	PressDown                        0165            LABEL
+	FimPressDown                     0170            LABEL
+	PressRight                       0172            LABEL
+	FimPressRight                    017D            LABEL
+	EatFood                          017F            LABEL
+	RepeatAction                     0194            LABEL
+	FimRepeatAction                  01AD            LABEL
+	RandomV1                         01B3            LABEL
+	Rnd_Rotate                       01BD            LABEL
+	UpdateScore                      01C1            LABEL
+	ChangeDecimal                    01CE            LABEL
+	ChangeCentesimal                 01DC            LABEL
+	PrintScore                       01E2            LABEL
+	SpawnFood                        020C            LABEL
+	GenerateFood                     020E            LABEL
+	Main                             0242            LABEL
+	Cycle                            0252            LABEL
+	Halt                             0253            LABEL

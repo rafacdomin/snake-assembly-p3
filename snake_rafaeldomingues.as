@@ -28,10 +28,10 @@ MAX_ROWS        EQU     24d
 MAX_COLS        EQU     80d
 
 ; Linhas ou Colunas das paredes
-WALL_TOP        EQU     1d
-WALL_BOTTOM     EQU     23d
-WALL_RIGHT      EQU     79d
-WALL_LEFT       EQU     0d
+WALL_TOP        EQU     0100h
+WALL_BOTTOM     EQU     2300h
+WALL_RIGHT      EQU     0079h
+WALL_LEFT       EQU     0000h
 
 ; Controles
 UP              EQU     0d
@@ -88,10 +88,6 @@ Score           WORD    0d
 ScoreU          WORD    '0'
 ScoreD          WORD    '0'
 ScoreC          WORD    '0'
-
-; Posicao inicial (centro)
-SnakeRow        WORD    12d
-SnakeCol        WORD    40d
 
 ; Posicao inicial comida
 FoodRow         WORD    7d
@@ -290,73 +286,31 @@ MoveUp:         PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeRow ]
-				DEC     R1
+				MOV     R1, M[ SnakeHead ]
+                SUB     R1, 0100h
+				AND     R1, ff00h
 				CMP     R1, WALL_TOP
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]
+                MOV     R1, M[ SnakeHead ]
 
                 ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
 
                 ; Imprime cobra na nova posição 
-				DEC     M[ SnakeRow ]
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]  
+                MOV     R1, M[ SnakeHead ]
+                SUB     R1, 0100h
+                MOV     M[ SnakeHead ], R1
 				
                 MOV     R3, SNAKE_HEAD
                 MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
 
 FimMoveUp:      POP     R3
-				POP     R2
-                POP     R1
-
-				RET
-
-;------------------------------------------------------------------------------
-; Rotina de Interrupção MoveLeft
-;------------------------------------------------------------------------------
-MoveLeft:       PUSH    R1
-                PUSH    R2
-                PUSH    R3
-
-                ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeCol ]
-				DEC     R1
-				CMP     R1, WALL_LEFT
-				CALL.Z  EndGame
-
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]
-
-                ; Substitui posição da cobra por um caracter em branco 
-				MOV     R3, EMPTY_SPACE
-                MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
-
-                ; Imprime cobra na nova posição 
-				DEC     M[ SnakeCol ]
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]  
-				
-                MOV     R3, SNAKE_HEAD
-                MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
-
-FimMoveLeft:    POP     R3
 				POP     R2
                 POP     R1
 
@@ -370,33 +324,68 @@ MoveDown:       PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeRow ]
-				INC     R1
+				MOV     R1, M[ SnakeHead ]
+                ADD     R1, 0100h
+				AND     R1, ff00h
 				CMP     R1, WALL_BOTTOM
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]
+                MOV     R1, M[ SnakeHead ]
 
                 ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
 
                 ; Imprime cobra na nova posição 
-				INC     M[ SnakeRow ]
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]  
+                MOV     R1, M[ SnakeHead ]
+                ADD     R1, 0100h
+                MOV     M[ SnakeHead ], R1
 				
                 MOV     R3, SNAKE_HEAD
                 MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
 
 FimMoveDown:    POP     R3
+				POP     R2
+                POP     R1
+
+				RET
+
+;------------------------------------------------------------------------------
+; Rotina de Interrupção MoveLeft
+;------------------------------------------------------------------------------
+MoveLeft:       PUSH    R1
+                PUSH    R2
+                PUSH    R3
+
+                ; Verifica se a proxima posição é uma parede 
+				MOV     R1, M[ SnakeHead ]
+				DEC     R1
+                AND     R1, 00ffh
+				CMP     R1, WALL_LEFT
+				CALL.Z  EndGame
+
+                MOV     R1, M[ SnakeHead ]
+
+                ; Substitui posição da cobra por um caracter em branco 
+				MOV     R3, EMPTY_SPACE
+                MOV     M[ Caracter ], R3
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
+
+                ; Imprime cobra na nova posição 
+				DEC     M[ SnakeHead ]
+                MOV     R1, M[ SnakeHead ] 
+				
+                MOV     R3, SNAKE_HEAD
+                MOV     M[ Caracter ], R3
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
+
+FimMoveLeft:    POP     R3
 				POP     R2
                 POP     R1
 
@@ -410,31 +399,28 @@ MoveRight:      PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeCol ]
+				MOV     R1, M[ SnakeHead ]
 				INC     R1
-				CMP     R1, WALL_RIGHT
+                AND     R1, 00ffh
+				CMP     R1, WALL_LEFT
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]
+                MOV     R1, M[ SnakeHead ]
 
                 ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
 
                 ; Imprime cobra na nova posição 
-				INC     M[ SnakeCol ]
-                MOV     R1, M[ SnakeRow ]
-				MOV     R2, M[ SnakeCol ]  
+				INC     M[ SnakeHead ]
+                MOV     R1, M[ SnakeHead ] 
 				
                 MOV     R3, SNAKE_HEAD
                 MOV     M[ Caracter ], R3
-                MOV     M[LinhaCursor], R1
-                MOV     M[ColunaCursor], R2
-                CALL    ImprimeCaracter
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracterV2
 
 FimMoveRight:   POP     R3
 				POP     R2
@@ -519,10 +505,7 @@ EatFood:        PUSH    R1
                 PUSH    R2
                 PUSH    R3
 
-                MOV     R1, M[ SnakeRow ]
-                MOV     R2, M[ SnakeCol ]
-                SHL     R1, ROW_SHIFT
-                OR      R1, R2
+                MOV     R1, M[ SnakeHead ]
                 
                 MOV     R2, M[ FoodRow ]
                 MOV     R3, M[ FoodCol ]
@@ -664,10 +647,7 @@ GenerateFood:   CALL    RandomV1
                 MOV     M[ FoodCol ], R2
 
                 ; Verifica se a comida não vai spawnar na mesma posição da cobra
-                MOV     R1, M[ SnakeRow ]
-                MOV     R2, M[ SnakeCol ]
-                SHL     R1, ROW_SHIFT
-                OR      R1, R2
+                MOV     R1, M[ SnakeHead ]
                 
                 MOV     R2, M[ FoodRow ]
                 MOV     R3, M[ FoodCol ]
