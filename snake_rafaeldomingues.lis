@@ -13,7 +13,7 @@
 	CURSOR                           FFFC         CONSTANT
 	CURSOR_INIT                      FFFF         CONSTANT
 	INTERRUPTOR                      FFF9         CONSTANT
-	WIN_CONDITION                    0001         CONSTANT
+	WIN_CONDITION                    0005         CONSTANT
 	ROW_POSITION                     0000         CONSTANT
 	COL_POSITION                     0000         CONSTANT
 	ROW_SHIFT                        0008         CONSTANT
@@ -99,6 +99,7 @@
 	EndBodyColisionLoop              00D0            LABEL
 	MoveLoop                         00DD            LABEL
 	EndMoveLoop                      00E8            LABEL
+	EndMove                          00F5            LABEL
 	StartTimer                       00F9            LABEL
 	PressUp                          0104            LABEL
 	FimPressUp                       010F            LABEL
@@ -111,23 +112,23 @@
 	EatFood                          0138            LABEL
 	EatFoodLoop                      0140            LABEL
 	FimEatFoodLoop                   014A            LABEL
-	End_EatFood                      014E            LABEL
-	RepeatAction                     0153            LABEL
-	MoveUp                           016A            LABEL
-	MoveDown                         0170            LABEL
-	MoveLeft                         0176            LABEL
-	MoveRight                        017B            LABEL
-	EndRepeatAction                  017E            LABEL
-	RandomV1                         0185            LABEL
-	Rnd_Rotate                       018F            LABEL
-	UpdateScore                      0193            LABEL
-	ChangeDecimal                    01A0            LABEL
-	ChangeCentesimal                 01AE            LABEL
-	PrintScore                       01B4            LABEL
-	SpawnFood                        01E3            LABEL
-	GenerateFood                     01E6            LABEL
-	FoodPosLoop                      01FE            LABEL
-	EndFoodPosLoop                   0209            LABEL
-	Main                             0217            LABEL
-	Cycle                            022C            LABEL
-	Halt                             022D            LABEL
+	End_EatFood                      015B            LABEL
+	RepeatAction                     0160            LABEL
+	MoveUp                           0177            LABEL
+	MoveDown                         017D            LABEL
+	MoveLeft                         0183            LABEL
+	MoveRight                        0188            LABEL
+	EndRepeatAction                  018B            LABEL
+	RandomV1                         0192            LABEL
+	Rnd_Rotate                       019C            LABEL
+	UpdateScore                      01A0            LABEL
+	ChangeDecimal                    01AD            LABEL
+	ChangeCentesimal                 01BB            LABEL
+	PrintScore                       01C1            LABEL
+	SpawnFood                        01F0            LABEL
+	GenerateFood                     01F3            LABEL
+	FoodPosLoop                      020B            LABEL
+	EndFoodPosLoop                   0216            LABEL
+	Main                             0224            LABEL
+	Cycle                            0239            LABEL
+	Halt                             023A            LABEL

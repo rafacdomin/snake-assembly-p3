@@ -12,7 +12,7 @@ INITIAL_SP      EQU     FDFFh
 CURSOR		    EQU     FFFCh
 CURSOR_INIT		EQU		FFFFh
 INTERRUPTOR     EQU     FFF9h
-WIN_CONDITION   EQU     1d
+WIN_CONDITION   EQU     10d
 
 ROW_POSITION	EQU		0d
 COL_POSITION	EQU		0d
@@ -302,7 +302,7 @@ Move:                           PUSH    R1
                                 CMP     R1, R2
                                 CALL.Z  EatFood
                                 CMP     R1, R2
-                                JMP.Z   EndMoveLoop
+                                JMP.Z   EndMove
 
                                 ; Verifica se a proxima posição é o proprio corpo
                                 MOV     R1, M[ NextPos ]
@@ -348,7 +348,7 @@ EndMoveLoop:                    MOV     R2, M[ HeadAddress ]
                                 MOV     M[ PosCursor ], R1
                                 CALL    ImprimeCaracter
 
-                                POP     R3
+EndMove:                        POP     R3
                                 POP     R2
                                 POP     R1
                                 RET
@@ -446,7 +446,17 @@ EatFoodLoop:    CMP     R1, M[ HeadAddress ]
 
                 JMP     EatFoodLoop
 
-FimEatFoodLoop: CALL    UpdateScore
+                ; Imprime cabeça da cobra na nova posição 
+FimEatFoodLoop: MOV     R2, M[ HeadAddress ]
+                MOV     R1, M[ NextPos ]
+                MOV     M[ R2 ], R1
+                
+                MOV     R3, SNAKE_HEAD
+                MOV     M[ Caracter ], R3
+                MOV     M[ PosCursor ], R1
+                CALL    ImprimeCaracter
+
+                CALL    UpdateScore
                 CALL    SpawnFood
                 
 End_EatFood:    POP     R4
