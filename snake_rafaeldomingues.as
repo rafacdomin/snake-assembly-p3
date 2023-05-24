@@ -765,15 +765,22 @@ GenerateFood:   CALL    RandomV1
                 DIV     R1, R3
                 ADD     R3, 1d
 
-                ; Verifica se a comida não vai spawnar na mesma posição da cobra
-                MOV     R1, M[ HeadAddress ]
-                MOV     R1, M[ R1 ]
                 SHL     R2, ROW_SHIFT
                 OR      R2, R3
-                CMP     R1, R2
+
+                ; Verifica se a comida não vai spawnar na mesma posição da cobra
+                MOV     R1, M[ TailAddress ]
+FoodPosLoop:    CMP     R1, M[ HeadAddress ]
+                JMP.Z   EndFoodPosLoop
+
+                MOV     R3, M[ R1 ]
+                CMP     R3, R2
                 JMP.Z   GenerateFood
 
-                MOV     M[ FoodPos ], R2
+                DEC     R1
+                JMP     FoodPosLoop
+
+EndFoodPosLoop: MOV     M[ FoodPos ], R2
 
                 MOV     M[ PosCursor ], R2
                 MOV     R1, FOOD

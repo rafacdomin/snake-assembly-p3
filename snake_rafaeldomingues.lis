@@ -135,6 +135,8 @@
 	PrintScore                       0258            LABEL
 	SpawnFood                        0282            LABEL
 	GenerateFood                     0285            LABEL
-	Main                             02AF            LABEL
-	Cycle                            02C4            LABEL
-	Halt                             02C5            LABEL
+	FoodPosLoop                      029D            LABEL
+	EndFoodPosLoop                   02A8            LABEL
+	Main                             02B6            LABEL
+	Cycle                            02CB            LABEL
+	Halt                             02CC            LABEL
