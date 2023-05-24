@@ -25,7 +25,7 @@
 	MAX_COLS                         0050         CONSTANT
 	WALL_TOP                         0100         CONSTANT
 	WALL_BOTTOM                      1700         CONSTANT
-	WALL_RIGHT                       0079         CONSTANT
+	WALL_RIGHT                       004F         CONSTANT
 	WALL_LEFT                        0000         CONSTANT
 	UP                               0000         CONSTANT
 	LEFT                             0001         CONSTANT
@@ -68,16 +68,17 @@
 	ScoreD                           87B3         VARIABLE
 	ScoreC                           87B4         VARIABLE
 	FoodPos                          87B5         VARIABLE
-	InitialPos                       87B6         VARIABLE
-	HeadAddress                      87B7         VARIABLE
-	TailAddress                      87B8         VARIABLE
-	TextIndex                        87B9         VARIABLE
-	Caracter                         87BA         VARIABLE
-	LastAction                       87BB         VARIABLE
-	LinhaCursor                      87BC         VARIABLE
-	ColunaCursor                     87BD         VARIABLE
-	PosCursor                        87BE         VARIABLE
-	Random_Var                       87BF         VARIABLE
+	NextPos                          87B6         VARIABLE
+	InitialPos                       87B7         VARIABLE
+	HeadAddress                      87B8         VARIABLE
+	TailAddress                      87B9         VARIABLE
+	TextIndex                        87BA         VARIABLE
+	Caracter                         87BB         VARIABLE
+	LastAction                       87BC         VARIABLE
+	LinhaCursor                      87BD         VARIABLE
+	ColunaCursor                     87BE         VARIABLE
+	PosCursor                        87BF         VARIABLE
+	Random_Var                       87C0         VARIABLE
 	INT0                             FE00         VARIABLE
 	INT1                             FE01         VARIABLE
 	INT2                             FE02         VARIABLE
@@ -96,55 +97,40 @@
 	Loop1                            007C            LABEL
 	MudaLinha                        0098            LABEL
 	FimImprimeMapa                   009D            LABEL
-	MoveUp                           00A2            LABEL
-	BodyColisionLoopUp               00BF            LABEL
-	EndBodyColisionLoopUp            00CE            LABEL
-	UpLoop                           00DB            LABEL
-	EndUpLoop                        00E6            LABEL
-	FimMoveUp                        00F6            LABEL
-	MoveDown                         00FA            LABEL
-	BodyColisionLoopDown             0117            LABEL
-	EndBodyColisionLoopDown          0126            LABEL
-	DownLoop                         0133            LABEL
-	EndDownLoop                      013E            LABEL
-	FimMoveDown                      014E            LABEL
-	MoveLeft                         0152            LABEL
-	BodyColisionLoopLeft             016D            LABEL
-	EndBodyColisionLoopLeft          017B            LABEL
-	LeftLoop                         0188            LABEL
-	EndLeftLoop                      0193            LABEL
-	FimMoveLeft                      019F            LABEL
-	MoveRight                        01A3            LABEL
-	BodyColisionLoopRight            01BE            LABEL
-	EndBodyColisionLoopRight         01CC            LABEL
-	RightLoop                        01D9            LABEL
-	EndRightLoop                     01E4            LABEL
-	FimMoveRight                     01F0            LABEL
-	StartTimer                       01F4            LABEL
-	PressUp                          01FF            LABEL
-	FimPressUp                       020A            LABEL
-	PressLeft                        020C            LABEL
-	FimPressLeft                     0217            LABEL
-	PressDown                        0219            LABEL
-	FimPressDown                     0224            LABEL
-	PressRight                       0226            LABEL
-	FimPressRight                    0231            LABEL
-	EatFood                          0233            LABEL
-	EatFoodLoop                      023B            LABEL
-	FimEatFoodLoop                   0245            LABEL
-	End_EatFood                      0249            LABEL
-	RepeatAction                     024E            LABEL
-	FimRepeatAction                  0267            LABEL
-	RandomV1                         026B            LABEL
-	Rnd_Rotate                       0275            LABEL
-	UpdateScore                      0279            LABEL
-	ChangeDecimal                    0286            LABEL
-	ChangeCentesimal                 0294            LABEL
-	PrintScore                       029A            LABEL
-	SpawnFood                        02C4            LABEL
-	GenerateFood                     02C7            LABEL
-	FoodPosLoop                      02DF            LABEL
-	EndFoodPosLoop                   02EA            LABEL
-	Main                             02F8            LABEL
-	Cycle                            030D            LABEL
-	Halt                             030E            LABEL
+	Move                             00A2            LABEL
+	BodyColisionLoop                 00D1            LABEL
+	EndBodyColisionLoop              00DB            LABEL
+	MoveLoop                         00E8            LABEL
+	EndMoveLoop                      00F3            LABEL
+	StartTimer                       0104            LABEL
+	PressUp                          010F            LABEL
+	FimPressUp                       011A            LABEL
+	PressLeft                        011C            LABEL
+	FimPressLeft                     0127            LABEL
+	PressDown                        0129            LABEL
+	FimPressDown                     0134            LABEL
+	PressRight                       0136            LABEL
+	FimPressRight                    0141            LABEL
+	EatFood                          0143            LABEL
+	EatFoodLoop                      014B            LABEL
+	FimEatFoodLoop                   0155            LABEL
+	End_EatFood                      0159            LABEL
+	RepeatAction                     015E            LABEL
+	MoveUp                           0175            LABEL
+	MoveDown                         017B            LABEL
+	MoveLeft                         0181            LABEL
+	MoveRight                        0186            LABEL
+	EndRepeatAction                  0189            LABEL
+	RandomV1                         0190            LABEL
+	Rnd_Rotate                       019A            LABEL
+	UpdateScore                      019E            LABEL
+	ChangeDecimal                    01AB            LABEL
+	ChangeCentesimal                 01B9            LABEL
+	PrintScore                       01BF            LABEL
+	SpawnFood                        01E9            LABEL
+	GenerateFood                     01EC            LABEL
+	FoodPosLoop                      0204            LABEL
+	EndFoodPosLoop                   020F            LABEL
+	Main                             021D            LABEL
+	Cycle                            0232            LABEL
+	Halt                             0233            LABEL

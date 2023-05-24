@@ -30,7 +30,7 @@ MAX_COLS        EQU     80d
 ; Linhas ou Colunas das paredes
 WALL_TOP        EQU     0100h
 WALL_BOTTOM     EQU     1700h
-WALL_RIGHT      EQU     0079h
+WALL_RIGHT      EQU     004fh
 WALL_LEFT       EQU     0000h
 
 ; Controles
@@ -90,11 +90,12 @@ ScoreD          WORD    '0'
 ScoreC          WORD    '0'
 
 ; Posicao inicial comida
-FoodPos         WORD    0728h
+FoodPos         WORD    0728h ; linha 7 (0007h) coluna 40 (0028h)
 
 ; Posicao da lista
 ; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
 ; Linha 12 (000ch), Coluna 40(0028h)
+NextPos         WORD    0000h
 InitialPos      WORD    0c28h
 HeadAddress     WORD    9000h ; Endereço da cabeça (36864d)
 TailAddress     WORD    9000h ; Endereço da cauda
@@ -279,73 +280,83 @@ FimImprimeMapa: POP     R4
                 POP     R1
                 RET
 
+
 ;------------------------------------------------------------------------------
-; Rotina de Interrupção MoveUp
+;   Move: Rotina para mover a cobra em uma direção
+;                   Parametros: M[ NextPos ] - Proxima posicao desejada
 ;------------------------------------------------------------------------------
-MoveUp:                         PUSH    R1
+Move:                           PUSH    R1
                                 PUSH    R2
                                 PUSH    R3
+                                
+                                ; Verifica se a proxima posição é uma das paredes
+                                MOV     R1, M[ NextPos ]
 
-                                ; Verifica se a proxima posição é uma parede 
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                SUB     R1, 0100h
-                                AND     R1, ff00h
-                                CMP     R1, WALL_TOP
+                                MOV     R2, R1
+                                AND     R2, ff00h
+                                CMP     R2, WALL_TOP
+                                CALL.Z  EndGame
+
+                                MOV     R2, R1
+                                AND     R2, ff00h
+                                CMP     R2, WALL_BOTTOM
+                                CALL.Z  EndGame
+
+                                MOV     R2, R1
+                                AND     R2, 00ffh
+                                CMP     R2, WALL_LEFT
+                                CALL.Z  EndGame
+
+                                MOV     R2, R1
+                                AND     R2, 00ffh
+                                CMP     R2, WALL_RIGHT
                                 CALL.Z  EndGame
 
                                 ; Verifica se a proxima posição é uma comida
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                SUB     R1, 0100h
+                                MOV     R1, M[ NextPos ]
                                 MOV     R2, M[ FoodPos ]
                                 CMP     R1, R2
                                 CALL.Z  EatFood
                                 CMP     R1, R2
-                                JMP.Z   EndUpLoop
+                                JMP.Z   EndMoveLoop
 
                                 ; Verifica se a proxima posição é o proprio corpo
+                                MOV     R1, M[ NextPos ]
                                 MOV     R2, M[ TailAddress ]
-BodyColisionLoopUp:             CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndBodyColisionLoopUp
+BodyColisionLoop:               CMP     R2, M[ HeadAddress ]
+                                JMP.Z   EndBodyColisionLoop
 
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                SUB     R1, 0100h
                                 CMP     R1, M[ R2 ]
                                 CALL.Z  EndGame
 
                                 DEC     R2
-                                JMP     BodyColisionLoopUp
+                                JMP     BodyColisionLoop
 
                                 ; Substitui ultima posição da cobra por um caracter em branco
-EndBodyColisionLoopUp:          MOV     R1, M[ TailAddress ]
-                                MOV     R1, M[ R1 ]
+EndBodyColisionLoop:            MOV     R2, M[ TailAddress ]
+                                MOV     R2, M[ R2 ]
                                 MOV     R3, EMPTY_SPACE
                                 MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
+                                MOV     M[ PosCursor ], R2
                                 CALL    ImprimeCaracterV2
 
-                                ; Anda 1 posição
+                                ; Anda todo corpo 1 posição
                                 MOV     R2, M[ TailAddress ]
+MoveLoop:                       CMP     R2, M[ HeadAddress ]
+                                JMP.Z   EndMoveLoop
 
-UpLoop:                         CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndUpLoop
-
-                                MOV     R1, R2
-                                DEC     R1
-                                MOV     R1, M[ R1 ]
-                                MOV     M[ R2 ], R1
+                                MOV     R3, R2
+                                DEC     R3
+                                MOV     R3, M[ R3 ]
+                                MOV     M[ R2 ], R3
 
                                 DEC     R2
 
-                                JMP     UpLoop
+                                JMP     MoveLoop
 
-                                ; Imprime cobra na nova posição 
-EndUpLoop:                      MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                SUB     R1, 0100h
-                                MOV     R2, M[ HeadAddress ]
+                                ; Imprime cabeça da cobra na nova posição 
+EndMoveLoop:                    MOV     R2, M[ HeadAddress ]
+                                MOV     R1, M[ NextPos ]
                                 MOV     M[ R2 ], R1
                                 
                                 MOV     R3, SNAKE_HEAD
@@ -353,247 +364,9 @@ EndUpLoop:                      MOV     R1, M[ HeadAddress ]
                                 MOV     M[ PosCursor ], R1
                                 CALL    ImprimeCaracterV2
 
-FimMoveUp:                      POP     R3
+                                POP     R3
                                 POP     R2
                                 POP     R1
-
-                                RET
-
-;------------------------------------------------------------------------------
-; Rotina de Interrupção MoveDown
-;------------------------------------------------------------------------------
-MoveDown:                       PUSH    R1
-                                PUSH    R2
-                                PUSH    R3
-
-                                ; Verifica se a proxima posição é uma parede 
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                ADD     R1, 0100h
-                                AND     R1, ff00h
-                                CMP     R1, WALL_BOTTOM
-                                CALL.Z  EndGame
-
-                                ; Verifica se a proxima posição é uma comida
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                ADD     R1, 0100h
-                                MOV     R2, M[ FoodPos ]
-                                CMP     R1, R2
-                                CALL.Z  EatFood
-                                CMP     R1, R2
-                                JMP.Z   EndDownLoop
-
-                                ; Verifica se a proxima posição é o proprio corpo
-                                MOV     R2, M[ TailAddress ]
-BodyColisionLoopDown:           CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndBodyColisionLoopDown
-
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                ADD     R1, 0100h
-                                CMP     R1, M[ R2 ]
-                                CALL.Z  EndGame
-
-                                DEC     R2
-                                JMP     BodyColisionLoopDown
-
-                                ; Substitui ultima posição da cobra por um caracter em branco
-EndBodyColisionLoopDown:        MOV     R1, M[ TailAddress ]
-                                MOV     R1, M[ R1 ]
-                                MOV     R3, EMPTY_SPACE
-                                MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
-
-                                ; Anda 1 posição
-                                MOV     R2, M[ TailAddress ]
-
-DownLoop:                       CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndDownLoop
-                                
-                                MOV     R1, R2
-                                DEC     R1
-                                MOV     R1, M[ R1 ]
-                                MOV     M[ R2 ], R1
-
-                                DEC     R2
-
-                                JMP     DownLoop
-
-
-                                ; Imprime cobra na nova posição 
-EndDownLoop:                    MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                ADD     R1, 0100h
-                                MOV     R2, M[ HeadAddress ]
-                                MOV     M[ R2 ], R1
-                                
-                                MOV     R3, SNAKE_HEAD
-                                MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
-
-FimMoveDown:                    POP     R3
-                                POP     R2
-                                POP     R1
-
-                                RET
-
-;------------------------------------------------------------------------------
-; Rotina de Interrupção MoveLeft
-;------------------------------------------------------------------------------
-MoveLeft:                       PUSH    R1
-                                PUSH    R2
-                                PUSH    R3
-
-                                ; Verifica se a proxima posição é uma parede 
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                DEC     R1
-                                AND     R1, 00ffh
-                                CMP     R1, WALL_LEFT
-                                CALL.Z  EndGame
-
-                                ; Verifica se a proxima posição é uma comida
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                DEC     R1
-                                MOV     R2, M[ FoodPos ]
-                                CMP     R1, R2
-                                CALL.Z  EatFood
-                                CMP     R1, R2
-                                JMP.Z   EndLeftLoop
-
-                                ; Verifica se a proxima posição é o proprio corpo
-                                MOV     R2, M[ TailAddress ]
-BodyColisionLoopLeft:           CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndBodyColisionLoopLeft
-
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                DEC     R1
-                                CMP     R1, M[ R2 ]
-                                CALL.Z  EndGame
-
-                                DEC     R2
-                                JMP     BodyColisionLoopLeft
-
-                                ; Substitui ultima posição da cobra por um caracter em branco
-EndBodyColisionLoopLeft:        MOV     R1, M[ TailAddress ]
-                                MOV     R1, M[ R1 ]
-                                MOV     R3, EMPTY_SPACE
-                                MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
-
-                                ; Anda 1 posição
-                                MOV     R2, M[ TailAddress ]
-
-LeftLoop:                       CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndLeftLoop
-                                
-                                MOV     R1, R2
-                                DEC     R1
-                                MOV     R1, M[ R1 ]
-                                MOV     M[ R2 ], R1
-
-                                DEC     R2
-
-                                JMP     LeftLoop
-
-                                ; Imprime a cabeça da cobra na nova posição
-EndLeftLoop:                    MOV     R2, M[ HeadAddress ] 
-                                DEC     M[ R2 ]
-                                MOV     R1, M[ R2 ]
-                                
-                                MOV     R3, SNAKE_HEAD
-                                MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
-
-FimMoveLeft:                    POP     R3
-                                POP     R2
-                                POP     R1
-
-                                RET
-
-;------------------------------------------------------------------------------
-; Rotina de Interrupção MoveRight
-;------------------------------------------------------------------------------
-MoveRight:                      PUSH    R1
-                                PUSH    R2
-                                PUSH    R3
-
-                                ; Verifica se a proxima posição é uma parede 
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                INC     R1
-                                AND     R1, 00ffh
-                                CMP     R1, WALL_RIGHT
-                                CALL.Z  EndGame
-
-                                ; Verifica se a proxima posição é uma comida
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                INC     R1
-                                MOV     R2, M[ FoodPos ]
-                                CMP     R1, R2
-                                CALL.Z  EatFood
-                                CMP     R1, R2
-                                JMP.Z   EndRightLoop
-
-                                ; Verifica se a proxima posição é o proprio corpo
-                                MOV     R2, M[ TailAddress ]
-BodyColisionLoopRight:          CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndBodyColisionLoopRight
-
-                                MOV     R1, M[ HeadAddress ]
-                                MOV     R1, M[ R1 ]
-                                INC     R1
-                                CMP     R1, M[ R2 ]
-                                CALL.Z  EndGame
-
-                                DEC     R2
-                                JMP     BodyColisionLoopRight
-
-                                ; Substitui ultima posição da cobra por um caracter em branco
-EndBodyColisionLoopRight:       MOV     R1, M[ TailAddress ]
-                                MOV     R1, M[ R1 ]
-                                MOV     R3, EMPTY_SPACE
-                                MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
-
-                                ; Anda 1 posição
-                                MOV     R2, M[ TailAddress ]
-
-RightLoop:                      CMP     R2, M[ HeadAddress ]
-                                JMP.Z   EndRightLoop
-                                
-                                MOV     R1, R2
-                                DEC     R1
-                                MOV     R1, M[ R1 ]
-                                MOV     M[ R2 ], R1
-
-                                DEC     R2
-
-                                JMP     RightLoop
-
-                                ; Imprime cobra na nova posição 
-EndRightLoop:                   MOV     R2, M[ HeadAddress ] 
-                                INC     M[ R2 ]
-                                MOV     R1, M[ R2 ]
-                                
-                                MOV     R3, SNAKE_HEAD
-                                MOV     M[ Caracter ], R3
-                                MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
-
-FimMoveRight:                   POP     R3
-                                POP     R2
-                                POP     R1
-
                                 RET
 
 ;------------------------------------------------------------------------------
@@ -702,26 +475,44 @@ End_EatFood:    POP     R4
 ; RepeatAction
 ;------------------------------------------------------------------------------
 RepeatAction:   PUSH    R1
+                PUSH    R2
+                
+                MOV     R1, M[ HeadAddress ]
+                MOV     R1, M[ R1 ]
+                MOV     R2, M[ LastAction ]
 
-                MOV     R1, M[ LastAction ]
-                CMP     R1, UP
-                CALL.Z  MoveUp
-                JMP.Z   FimRepeatAction
+                CMP     R2, UP
+                JMP.Z  MoveUp
 
-                CMP     R1, LEFT
-                CALL.Z  MoveLeft
-                JMP.Z   FimRepeatAction
+                CMP     R2, DOWN
+                JMP.Z  MoveDown
 
-                CMP     R1, DOWN
-                CALL.Z  MoveDown
-                JMP.Z   FimRepeatAction
+                CMP     R2, LEFT
+                JMP.Z   MoveLeft
 
-                CMP     R1, RIGHT
-                CALL.Z  MoveRight
+                CMP     R2, RIGHT
+                JMP.Z  MoveRight
 
-FimRepeatAction:    CALL    StartTimer
-                    POP     R1
-                    RTI
+MoveUp:         SUB     R1, 0100h
+                MOV     M[ NextPos ], R1
+                JMP     EndRepeatAction
+
+MoveDown:       ADD     R1, 0100h
+                MOV     M[ NextPos ], R1
+                JMP     EndRepeatAction
+
+MoveLeft:       DEC     R1
+                MOV     M[ NextPos ], R1
+                JMP     EndRepeatAction
+
+MoveRight:      INC     R1
+                MOV     M[ NextPos ], R1
+
+EndRepeatAction:CALL    Move
+                CALL    StartTimer
+                POP     R2
+                POP     R1
+                RTI
 
 ;------------------------------------------------------------------------------
 ; Função: RandomV1 (versão 1)
