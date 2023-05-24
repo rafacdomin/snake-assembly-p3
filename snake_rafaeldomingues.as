@@ -304,8 +304,22 @@ MoveUp:         PUSH    R1
                 CMP     R1, R2
                 JMP.Z   EndUpLoop
 
+                ; Verifica se a proxima posição é o proprio corpo
+                    MOV     R2, M[ TailAddress ]
+BodyColisionLoopUp:   CMP     R2, M[ HeadAddress ]
+                    JMP.Z   EndBodyColisionLoopUp
+
+                    MOV     R1, M[ HeadAddress ]
+                    MOV     R1, M[ R1 ]
+                    SUB     R1, 0100h
+                    CMP     R1, M[ R2 ]
+                    CALL.Z  EndGame
+
+                    DEC     R2
+                    JMP     BodyColisionLoopUp
+
                 ; Substitui ultima posição da cobra por um caracter em branco
-                MOV     R1, M[ TailAddress ]
+EndBodyColisionLoopUp:    MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
@@ -370,8 +384,22 @@ MoveDown:       PUSH    R1
                 CMP     R1, R2
                 JMP.Z   EndDownLoop
 
+                ; Verifica se a proxima posição é o proprio corpo
+                    MOV     R2, M[ TailAddress ]
+BodyColisionLoopDown:   CMP     R2, M[ HeadAddress ]
+                    JMP.Z   EndBodyColisionLoopDown
+
+                    MOV     R1, M[ HeadAddress ]
+                    MOV     R1, M[ R1 ]
+                    ADD     R1, 0100h
+                    CMP     R1, M[ R2 ]
+                    CALL.Z  EndGame
+
+                    DEC     R2
+                    JMP     BodyColisionLoopDown
+
                 ; Substitui ultima posição da cobra por um caracter em branco
-                MOV     R1, M[ TailAddress ]
+EndBodyColisionLoopDown:    MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
@@ -437,8 +465,22 @@ MoveLeft:       PUSH    R1
                 CMP     R1, R2
                 JMP.Z   EndLeftLoop
 
+                ; Verifica se a proxima posição é o proprio corpo
+                    MOV     R2, M[ TailAddress ]
+BodyColisionLoopLeft:   CMP     R2, M[ HeadAddress ]
+                    JMP.Z   EndBodyColisionLoopLeft
+
+                    MOV     R1, M[ HeadAddress ]
+                    MOV     R1, M[ R1 ]
+                    DEC     R1
+                    CMP     R1, M[ R2 ]
+                    CALL.Z  EndGame
+
+                    DEC     R2
+                    JMP     BodyColisionLoopLeft
+
                 ; Substitui ultima posição da cobra por um caracter em branco
-                MOV     R1, M[ TailAddress ]
+EndBodyColisionLoopLeft:    MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
@@ -501,8 +543,22 @@ MoveRight:      PUSH    R1
                 CMP     R1, R2
                 JMP.Z   EndRightLoop
 
+                ; Verifica se a proxima posição é o proprio corpo
+                    MOV     R2, M[ TailAddress ]
+BodyColisionLoopRight:   CMP     R2, M[ HeadAddress ]
+                    JMP.Z   EndBodyColisionLoopRight
+
+                    MOV     R1, M[ HeadAddress ]
+                    MOV     R1, M[ R1 ]
+                    INC     R1
+                    CMP     R1, M[ R2 ]
+                    CALL.Z  EndGame
+
+                    DEC     R2
+                    JMP     BodyColisionLoopRight
+
                 ; Substitui ultima posição da cobra por um caracter em branco
-                MOV     R1, M[ TailAddress ]
+EndBodyColisionLoopRight:    MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
