@@ -90,8 +90,7 @@ ScoreD          WORD    '0'
 ScoreC          WORD    '0'
 
 ; Posicao inicial comida
-FoodRow         WORD    7d
-FoodCol         WORD    40d
+FoodPos         WORD    0728h
 
 ; Posicao da lista
 ; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
@@ -581,12 +580,7 @@ EatFood:        PUSH    R1
 
                 MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
-
-                MOV     R2, M[ FoodRow ]
-                MOV     R3, M[ FoodCol ]
-                SHL     R2, ROW_SHIFT
-                OR      R2, R3
-
+                MOV     R2, M[ FoodPos ]
                 CMP     R1, R2
                 JMP.NZ  End_EatFood
 
@@ -723,44 +717,41 @@ PrintScore:     MOV     R1, 0d
 ;   Função SpawnFood
 ;------------------------------------------------------------------------------
 SpawnFood:      PUSH    R1
-                PUSH    R2
+                PUSH    R2 ; FoodRow
+                PUSH    R3 ; FoodCol
 
+                ; Gera FoodRow
 GenerateFood:   CALL    RandomV1
                 MOV     R1, M[ Random_Var ]
                 MOV     R2, MAX_ROWS
                 DEC     R2
                 DIV     R1, R2
                 ADD     R2, 2d
-                MOV     M[ FoodRow ], R2
 
+                ; Gera FoodCol
                 CALL    RandomV1
                 MOV     R1, M[ Random_Var ]
-                MOV     R2, MAX_COLS
-                DEC     R2
-                DIV     R1, R2
-                ADD     R2, 1d
-                MOV     M[ FoodCol ], R2
+                MOV     R3, MAX_COLS
+                DEC     R3
+                DIV     R1, R3
+                ADD     R3, 1d
 
                 ; Verifica se a comida não vai spawnar na mesma posição da cobra
                 MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
-                
-                MOV     R2, M[ FoodRow ]
-                MOV     R3, M[ FoodCol ]
                 SHL     R2, ROW_SHIFT
                 OR      R2, R3
-
                 CMP     R1, R2
                 JMP.Z   GenerateFood
 
-                MOV     R1, M[ FoodRow ]
-                MOV     M[ LinhaCursor ], R1
-                MOV     R1, M[ FoodCol ]
-                MOV     M[ ColunaCursor ], R1
+                MOV     M[ FoodPos ], R2
+
+                MOV     M[ PosCursor ], R2
                 MOV     R1, FOOD
                 MOV     M[ Caracter ], R1
-                CALL    ImprimeCaracter
+                CALL    ImprimeCaracterV2
 
+                POP     R3
                 POP     R2
                 POP     R1
                 RET

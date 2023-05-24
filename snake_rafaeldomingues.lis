@@ -67,18 +67,17 @@
 	ScoreU                           87B2         VARIABLE
 	ScoreD                           87B3         VARIABLE
 	ScoreC                           87B4         VARIABLE
-	FoodRow                          87B5         VARIABLE
-	FoodCol                          87B6         VARIABLE
-	InitialPos                       87B7         VARIABLE
-	HeadAddress                      87B8         VARIABLE
-	TailAddress                      87B9         VARIABLE
-	TextIndex                        87BA         VARIABLE
-	Caracter                         87BB         VARIABLE
-	LastAction                       87BC         VARIABLE
-	LinhaCursor                      87BD         VARIABLE
-	ColunaCursor                     87BE         VARIABLE
-	PosCursor                        87BF         VARIABLE
-	Random_Var                       87C0         VARIABLE
+	FoodPos                          87B5         VARIABLE
+	InitialPos                       87B6         VARIABLE
+	HeadAddress                      87B7         VARIABLE
+	TailAddress                      87B8         VARIABLE
+	TextIndex                        87B9         VARIABLE
+	Caracter                         87BA         VARIABLE
+	LastAction                       87BB         VARIABLE
+	LinhaCursor                      87BC         VARIABLE
+	ColunaCursor                     87BD         VARIABLE
+	PosCursor                        87BE         VARIABLE
+	Random_Var                       87BF         VARIABLE
 	INT0                             FE00         VARIABLE
 	INT1                             FE01         VARIABLE
 	INT2                             FE02         VARIABLE
@@ -123,19 +122,19 @@
 	PressRight                       01B2            LABEL
 	FimPressRight                    01BD            LABEL
 	EatFood                          01BF            LABEL
-	EatFoodLoop                      01D7            LABEL
-	FimEatFoodLoop                   01E1            LABEL
-	End_EatFood                      01E5            LABEL
-	RepeatAction                     01EA            LABEL
-	FimRepeatAction                  0203            LABEL
-	RandomV1                         0209            LABEL
-	Rnd_Rotate                       0213            LABEL
-	UpdateScore                      0217            LABEL
-	ChangeDecimal                    0224            LABEL
-	ChangeCentesimal                 0232            LABEL
-	PrintScore                       0238            LABEL
-	SpawnFood                        0262            LABEL
-	GenerateFood                     0264            LABEL
-	Main                             0299            LABEL
-	Cycle                            02AE            LABEL
-	Halt                             02AF            LABEL
+	EatFoodLoop                      01D3            LABEL
+	FimEatFoodLoop                   01DD            LABEL
+	End_EatFood                      01E1            LABEL
+	RepeatAction                     01E6            LABEL
+	FimRepeatAction                  01FF            LABEL
+	RandomV1                         0205            LABEL
+	Rnd_Rotate                       020F            LABEL
+	UpdateScore                      0213            LABEL
+	ChangeDecimal                    0220            LABEL
+	ChangeCentesimal                 022E            LABEL
+	PrintScore                       0234            LABEL
+	SpawnFood                        025E            LABEL
+	GenerateFood                     0261            LABEL
+	Main                             028B            LABEL
+	Cycle                            02A0            LABEL
+	Halt                             02A1            LABEL
