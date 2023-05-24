@@ -97,13 +97,13 @@ FoodCol         WORD    40d
 ; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
 ; Linha 12 (000ch), Coluna 40(0028h)
 InitialPos      WORD    0c28h
-SnakeHead       WORD    9000h ; Endereço da cabeça
-SnakeTail       WORD    9000h ; Endereço da cauda
+HeadAddress     WORD    9000h ; Endereço da cabeça (36864d)
+TailAddress     WORD    9000h ; Endereço da cauda
 
 ; Parametros para rotinas
 TextIndex	    WORD	0d
 Caracter        WORD    ' '
-LastAction      WORD    1d
+LastAction      WORD    0d
 LinhaCursor     WORD    0d
 ColunaCursor    WORD    0d
 PosCursor       WORD    0000h
@@ -288,27 +288,41 @@ MoveUp:         PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeHead ]
+				MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
                 SUB     R1, 0100h
 				AND     R1, ff00h
 				CMP     R1, WALL_TOP
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeHead ]
+                ; Substitui posição da cobra por um caracter em branco
+                MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
-
-                ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
                 MOV     M[ PosCursor ], R1
                 CALL    ImprimeCaracterV2
 
+                ; Anda 1 posição
+                MOV     R2, M[ TailAddress ]
+
+UpLoop:         CMP     R2, M[ HeadAddress ]
+                JMP.Z   EndUpLoop
+
+                MOV     R1, R2
+                DEC     R1
+                MOV     R1, M[ R1 ]
+                MOV     M[ R2 ], R1
+
+                DEC     R2
+
+                JMP     UpLoop
+
                 ; Imprime cobra na nova posição 
-                MOV     R1, M[ SnakeHead ]
+EndUpLoop:      MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
                 SUB     R1, 0100h
-                MOV     R2, M[ SnakeHead ]
+                MOV     R2, M[ HeadAddress ]
                 MOV     M[ R2 ], R1
 				
                 MOV     R3, SNAKE_HEAD
@@ -330,27 +344,42 @@ MoveDown:       PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeHead ]
+				MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
                 ADD     R1, 0100h
 				AND     R1, ff00h
 				CMP     R1, WALL_BOTTOM
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeHead ]
+                ; Substitui posição da cobra por um caracter em branco
+                MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
-
-                ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
                 MOV     M[ PosCursor ], R1
                 CALL    ImprimeCaracterV2
 
+                ; Anda 1 posição
+                MOV     R2, M[ TailAddress ]
+
+DownLoop:       CMP     R2, M[ HeadAddress ]
+                JMP.Z   EndDownLoop
+                
+                MOV     R1, R2
+                DEC     R1
+                MOV     R1, M[ R1 ]
+                MOV     M[ R2 ], R1
+
+                DEC     R2
+
+                JMP     DownLoop
+
+
                 ; Imprime cobra na nova posição 
-                MOV     R1, M[ SnakeHead ]
+EndDownLoop:    MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
                 ADD     R1, 0100h
-                MOV     R2, M[ SnakeHead ]
+                MOV     R2, M[ HeadAddress ]
                 MOV     M[ R2 ], R1
 				
                 MOV     R3, SNAKE_HEAD
@@ -372,26 +401,40 @@ MoveLeft:       PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeHead ]
+				MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
 				DEC     R1
                 AND     R1, 00ffh
 				CMP     R1, WALL_LEFT
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeHead ]
+                ; Substitui a ultima posição da cobra por um caracter em branco
+                MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
-
-                ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
                 MOV     M[ PosCursor ], R1
                 CALL    ImprimeCaracterV2
 
-                ; Imprime cobra na nova posição
-                MOV     R2, M[ SnakeHead ] 
+                ; Anda 1 posição
+                MOV     R2, M[ TailAddress ]
+
+LeftLoop:       CMP     R2, M[ HeadAddress ]
+                JMP.Z   EndLeftLoop
+                
+                MOV     R1, R2
+                DEC     R1
+                MOV     R1, M[ R1 ]
+                MOV     M[ R2 ], R1
+
+                DEC     R2
+
+                JMP     LeftLoop
+
+                ; Imprime a cabeça da cobra na nova posição
+EndLeftLoop:    MOV     R2, M[ HeadAddress ] 
 				DEC     M[ R2 ]
-                MOV     R1, M[ R2 ] 
+                MOV     R1, M[ R2 ]
 				
                 MOV     R3, SNAKE_HEAD
                 MOV     M[ Caracter ], R3
@@ -412,24 +455,38 @@ MoveRight:      PUSH    R1
                 PUSH    R3
 
                 ; Verifica se a proxima posição é uma parede 
-				MOV     R1, M[ SnakeHead ]
+				MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
 				INC     R1
                 AND     R1, 00ffh
 				CMP     R1, WALL_LEFT
 				CALL.Z  EndGame
 
-                MOV     R1, M[ SnakeHead ]
+                ; Substitui posição da cobra por um caracter em branco
+                MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
-
-                ; Substitui posição da cobra por um caracter em branco 
 				MOV     R3, EMPTY_SPACE
                 MOV     M[ Caracter ], R3
                 MOV     M[ PosCursor ], R1
                 CALL    ImprimeCaracterV2
 
+                ; Anda 1 posição
+                MOV     R2, M[ TailAddress ]
+
+RightLoop:      CMP     R2, M[ HeadAddress ]
+                JMP.Z   EndRightLoop
+                
+                MOV     R1, R2
+                DEC     R1
+                MOV     R1, M[ R1 ]
+                MOV     M[ R2 ], R1
+
+                DEC     R2
+
+                JMP     RightLoop
+
                 ; Imprime cobra na nova posição 
-                MOV     R2, M[ SnakeHead ] 
+EndRightLoop:   MOV     R2, M[ HeadAddress ] 
 				INC     M[ R2 ]
                 MOV     R1, M[ R2 ]
 				
@@ -520,8 +577,9 @@ FimPressRight:  POP     R1
 EatFood:        PUSH    R1
                 PUSH    R2
                 PUSH    R3
+                PUSH    R4
 
-                MOV     R1, M[ SnakeHead ]
+                MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
 
                 MOV     R2, M[ FoodRow ]
@@ -535,10 +593,27 @@ EatFood:        PUSH    R1
                 CALL    UpdateScore
                 CALL    SpawnFood
 
-                MOV     R3, M[ SnakeTail ]
-                MOV     M[ R3 ], R2
+                ; Aumenta lista em uma posição
+                INC     M[ TailAddress ]
+                MOV     R1, M[ TailAddress ]
+                ; Move todo conteudo para a direita
+EatFoodLoop:    CMP     R1, M[ HeadAddress ]
+                JMP.Z   FimEatFoodLoop
+
+                MOV     R4, R1
+                DEC     R1
+                MOV     R3, M[ R1 ]
+                MOV     M[ R4 ], R3
+
+                JMP     EatFoodLoop
+
+                ; Adiciona posição da comida na cabeça da cobra
+FimEatFoodLoop: MOV     R4, M[ HeadAddress ]
+                MOV     R4, M[ R4 ]
+                MOV     M[ R4 ], R2
                 
-End_EatFood:    POP     R3
+End_EatFood:    POP     R4
+                POP     R3
                 POP     R2
                 POP     R1
                 RET
@@ -667,7 +742,7 @@ GenerateFood:   CALL    RandomV1
                 MOV     M[ FoodCol ], R2
 
                 ; Verifica se a comida não vai spawnar na mesma posição da cobra
-                MOV     R1, M[ SnakeHead ]
+                MOV     R1, M[ HeadAddress ]
                 MOV     R1, M[ R1 ]
                 
                 MOV     R2, M[ FoodRow ]
@@ -705,7 +780,7 @@ Main:			ENI
                 CALL    ImprimeMapa
 
                 MOV     R1, M[ InitialPos ]
-                MOV     R2, M[ SnakeHead ]
+                MOV     R2, M[ HeadAddress ]
                 MOV     M[ R2 ], R1 ; Guarda posicao inicial da cobra no inicio da lista
 
                 CALL    StartTimer
