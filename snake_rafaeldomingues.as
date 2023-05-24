@@ -294,7 +294,17 @@ MoveUp:         PUSH    R1
 				CMP     R1, WALL_TOP
 				CALL.Z  EndGame
 
-                ; Substitui posição da cobra por um caracter em branco
+                ; Verifica se a proxima posição é uma comida
+                MOV     R1, M[ HeadAddress ]
+                MOV     R1, M[ R1 ]
+                SUB     R1, 0100h
+                MOV     R2, M[ FoodPos ]
+                CMP     R1, R2
+                CALL.Z  EatFood
+                CMP     R1, R2
+                JMP.Z   EndUpLoop
+
+                ; Substitui ultima posição da cobra por um caracter em branco
                 MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
@@ -350,7 +360,17 @@ MoveDown:       PUSH    R1
 				CMP     R1, WALL_BOTTOM
 				CALL.Z  EndGame
 
-                ; Substitui posição da cobra por um caracter em branco
+                ; Verifica se a proxima posição é uma comida
+                MOV     R1, M[ HeadAddress ]
+                MOV     R1, M[ R1 ]
+                ADD     R1, 0100h
+                MOV     R2, M[ FoodPos ]
+                CMP     R1, R2
+                CALL.Z  EatFood
+                CMP     R1, R2
+                JMP.Z   EndDownLoop
+
+                ; Substitui ultima posição da cobra por um caracter em branco
                 MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
@@ -407,7 +427,17 @@ MoveLeft:       PUSH    R1
 				CMP     R1, WALL_LEFT
 				CALL.Z  EndGame
 
-                ; Substitui a ultima posição da cobra por um caracter em branco
+                ; Verifica se a proxima posição é uma comida
+                MOV     R1, M[ HeadAddress ]
+                MOV     R1, M[ R1 ]
+                DEC     R1
+                MOV     R2, M[ FoodPos ]
+                CMP     R1, R2
+                CALL.Z  EatFood
+                CMP     R1, R2
+                JMP.Z   EndLeftLoop
+
+                ; Substitui ultima posição da cobra por um caracter em branco
                 MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
@@ -461,7 +491,17 @@ MoveRight:      PUSH    R1
 				CMP     R1, WALL_RIGHT
 				CALL.Z  EndGame
 
-                ; Substitui posição da cobra por um caracter em branco
+                ; Verifica se a proxima posição é uma comida
+                MOV     R1, M[ HeadAddress ]
+                MOV     R1, M[ R1 ]
+                INC     R1
+                MOV     R2, M[ FoodPos ]
+                CMP     R1, R2
+                CALL.Z  EatFood
+                CMP     R1, R2
+                JMP.Z   EndRightLoop
+
+                ; Substitui ultima posição da cobra por um caracter em branco
                 MOV     R1, M[ TailAddress ]
                 MOV     R1, M[ R1 ]
 				MOV     R3, EMPTY_SPACE
@@ -578,19 +618,11 @@ EatFood:        PUSH    R1
                 PUSH    R3
                 PUSH    R4
 
-                MOV     R1, M[ HeadAddress ]
-                MOV     R1, M[ R1 ]
-                MOV     R2, M[ FoodPos ]
-                CMP     R1, R2
-                JMP.NZ  End_EatFood
-
-                CALL    UpdateScore
-                CALL    SpawnFood
-
                 ; Aumenta lista em uma posição
                 INC     M[ TailAddress ]
                 MOV     R1, M[ TailAddress ]
-                ; Move todo conteudo para a direita
+
+                ; Move todo conteudo da lista para endereço a direita
 EatFoodLoop:    CMP     R1, M[ HeadAddress ]
                 JMP.Z   FimEatFoodLoop
 
@@ -601,10 +633,8 @@ EatFoodLoop:    CMP     R1, M[ HeadAddress ]
 
                 JMP     EatFoodLoop
 
-                ; Adiciona posição da comida na cabeça da cobra
-FimEatFoodLoop: MOV     R4, M[ HeadAddress ]
-                MOV     R4, M[ R4 ]
-                MOV     M[ R4 ], R2
+FimEatFoodLoop: CALL    UpdateScore
+                CALL    SpawnFood
                 
 End_EatFood:    POP     R4
                 POP     R3
@@ -633,8 +663,7 @@ RepeatAction:   PUSH    R1
                 CMP     R1, RIGHT
                 CALL.Z  MoveRight
 
-FimRepeatAction:    CALL    EatFood
-                    CALL    StartTimer
+FimRepeatAction:    CALL    StartTimer
                     POP     R1
                     RTI
 
