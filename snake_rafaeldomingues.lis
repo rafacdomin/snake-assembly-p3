@@ -24,7 +24,7 @@
 	MAX_ROWS                         0018         CONSTANT
 	MAX_COLS                         0050         CONSTANT
 	WALL_TOP                         0100         CONSTANT
-	WALL_BOTTOM                      2300         CONSTANT
+	WALL_BOTTOM                      1700         CONSTANT
 	WALL_RIGHT                       0079         CONSTANT
 	WALL_LEFT                        0000         CONSTANT
 	UP                               0000         CONSTANT

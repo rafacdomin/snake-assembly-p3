@@ -29,7 +29,7 @@ MAX_COLS        EQU     80d
 
 ; Linhas ou Colunas das paredes
 WALL_TOP        EQU     0100h
-WALL_BOTTOM     EQU     2300h
+WALL_BOTTOM     EQU     1700h
 WALL_RIGHT      EQU     0079h
 WALL_LEFT       EQU     0000h
 
@@ -459,7 +459,7 @@ MoveRight:      PUSH    R1
                 MOV     R1, M[ R1 ]
 				INC     R1
                 AND     R1, 00ffh
-				CMP     R1, WALL_LEFT
+				CMP     R1, WALL_RIGHT
 				CALL.Z  EndGame
 
                 ; Substitui posição da cobra por um caracter em branco
