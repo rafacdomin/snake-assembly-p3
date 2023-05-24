@@ -41,6 +41,7 @@ RIGHT                   EQU     3d
 
 ; Caracteres usados
 SNAKE_HEAD              EQU     'X'
+SNAKE_BODY              EQU     'x'
 EMPTY_SPACE             EQU     ' '
 FOOD                    EQU     'o'
 
@@ -334,8 +335,12 @@ MoveLoop:               CMP     R2, M[ HeadAddress ]
                         MOV     R3, M[ R3 ]
                         MOV     M[ R2 ], R3
 
-                        DEC     R2
+                        MOV     R1, SNAKE_BODY
+                        MOV     M[ Caracter ], R1
+                        MOV     M[ PosCursor ], R3
+                        CALL    ImprimeCaracter
 
+                        DEC     R2
                         JMP     MoveLoop
 
                         ; Imprime cabeça da cobra na nova posição 
@@ -440,6 +445,11 @@ EatFoodLoop:            CMP     R1, M[ HeadAddress ]
                         DEC     R1
                         MOV     R3, M[ R1 ]
                         MOV     M[ R4 ], R3
+
+                        MOV     R2, SNAKE_BODY
+                        MOV     M[ Caracter ], R2
+                        MOV     M[ PosCursor ], R3
+                        CALL    ImprimeCaracter
 
                         JMP     EatFoodLoop
 
