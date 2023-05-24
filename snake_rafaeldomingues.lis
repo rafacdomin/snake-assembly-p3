@@ -13,7 +13,7 @@
 	CURSOR                           FFFC         CONSTANT
 	CURSOR_INIT                      FFFF         CONSTANT
 	INTERRUPTOR                      FFF9         CONSTANT
-	WIN_CONDITION                    0005         CONSTANT
+	WIN_CONDITION                    000A         CONSTANT
 	ROW_POSITION                     0000         CONSTANT
 	COL_POSITION                     0000         CONSTANT
 	ROW_SHIFT                        0008         CONSTANT
