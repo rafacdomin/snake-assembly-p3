@@ -12,7 +12,7 @@ INITIAL_SP      EQU     FDFFh
 CURSOR		    EQU     FFFCh
 CURSOR_INIT		EQU		FFFFh
 INTERRUPTOR     EQU     FFF9h
-WIN_CONDITION   EQU     10d
+WIN_CONDITION   EQU     1d
 
 ROW_POSITION	EQU		0d
 COL_POSITION	EQU		0d
@@ -104,8 +104,6 @@ TailAddress     WORD    9000h ; Endereço da cauda
 TextIndex	    WORD	0d
 Caracter        WORD    ' '
 LastAction      WORD    0d
-LinhaCursor     WORD    0d
-ColunaCursor    WORD    0d
 PosCursor       WORD    0000h
 Random_Var	    WORD	A5A5h  ; 1010 0101 1010 0101
 
@@ -135,6 +133,7 @@ INT15           WORD    RepeatAction ; 15 é reservado para o temporizador
 EndGame:        PUSH    R1
                 PUSH    R2
                 PUSH    R3
+                PUSH    R4
 
                 MOV     R2, 10d
                 MOV     R3, 35d
@@ -151,9 +150,11 @@ Loop_EndGame:   MOV		R1, M[ TextIndex ]
 				CMP 	R1, PULA_LINHA
 				JMP.Z	Linha_EndGame
 
+                MOV     R4, R2
+                SHL     R4, ROW_SHIFT
+                OR      R4, R3
+                MOV     M[ PosCursor ], R4
                 MOV     M[ Caracter ], R1
-                MOV     M[ LinhaCursor ], R2
-                MOV     M[ ColunaCursor ], R3
                 CALL    ImprimeCaracter
 
                 INC     M[ TextIndex ]
@@ -165,7 +166,8 @@ Linha_EndGame:  INC     R2
                 INC     M[ TextIndex ]
                 JMP     Loop_EndGame
 
-Fim_EndGame:    POP     R3
+Fim_EndGame:    POP     R4
+                POP     R3
                 POP     R2
                 POP     R1
                 CALL    Cycle
@@ -187,10 +189,11 @@ Loop_WinGame:   MOV		R1, M[ TextIndex ]
 				CMP 	R1, FIM_TEXTO
 				JMP.Z	Fim_WinGame
 
-
+                MOV     R2, 12d
+                SHL     R2, ROW_SHIFT
+                OR      R2, R3
+                MOV     M[ PosCursor ], R2
                 MOV     M[ Caracter ], R1
-                MOV     M[ LinhaCursor ], R2
-                MOV     M[ ColunaCursor ], R3
                 CALL    ImprimeCaracter
 
                 INC     M[TextIndex]
@@ -203,38 +206,17 @@ Fim_WinGame:    POP     R3
                 CALL    Cycle
 
 ;------------------------------------------------------------------------------
-; ImprimeCaracterV2:
+; ImprimeCaracter:
 ;               Parametros: M[ PosCursor ] - Posição Cursor
 ;                           M[ Caracter ] - caratere a ser imprimido
 ;------------------------------------------------------------------------------
-ImprimeCaracterV2:  PUSH R1
+ImprimeCaracter:  PUSH R1
 
                     MOV     R1, M[ PosCursor ]
                     MOV     M[ CURSOR ], R1
                     MOV     R1, M[ Caracter ]
                     MOV     M[ IO_WRITE ], R1
 
-                    POP     R1
-                    RET
-
-;------------------------------------------------------------------------------
-; ImprimeCaracter:
-;               Parametros: M[ LinhaCursor ] - linha cursor
-;                           M[ ColunaCursor ] - coluna cursor
-;                           M[ Caracter ] - caratere a ser imprimido
-;------------------------------------------------------------------------------
-ImprimeCaracter:    PUSH R1
-                    PUSH R2
-
-                    MOV     R1, M[ LinhaCursor ]
-                    MOV     R2, M[ ColunaCursor ]
-                    SHL     R1, ROW_SHIFT
-                    OR      R1, R2
-                    MOV     M[ CURSOR ], R1
-                    MOV     R1, M[ Caracter ]
-                    MOV     M[ IO_WRITE ], R1
-
-                    POP     R2
                     POP     R1
                     RET
 
@@ -258,9 +240,11 @@ Loop1:          CMP     R3, MAX_ROWS
 				CMP 	R1, FIM_TEXTO
 				JMP.Z	FimImprimeMapa
 
+                MOV     R2, R3
+                SHL     R2, ROW_SHIFT
+                OR      R2, R4
+                MOV		M[ PosCursor ], R2
                 MOV     M[ Caracter ], R1
-                MOV		M[ LinhaCursor ], R3 ; Linha do cursor
-				MOV		M[ ColunaCursor ], R4 ; Coluna do cursor
                 CALL    ImprimeCaracter
 
 				INC		M[ TextIndex ] ; Muda de caracter
@@ -338,7 +322,7 @@ EndBodyColisionLoop:            MOV     R2, M[ TailAddress ]
                                 MOV     R3, EMPTY_SPACE
                                 MOV     M[ Caracter ], R3
                                 MOV     M[ PosCursor ], R2
-                                CALL    ImprimeCaracterV2
+                                CALL    ImprimeCaracter
 
                                 ; Anda todo corpo 1 posição
                                 MOV     R2, M[ TailAddress ]
@@ -362,7 +346,7 @@ EndMoveLoop:                    MOV     R2, M[ HeadAddress ]
                                 MOV     R3, SNAKE_HEAD
                                 MOV     M[ Caracter ], R3
                                 MOV     M[ PosCursor ], R1
-                                CALL    ImprimeCaracterV2
+                                CALL    ImprimeCaracter
 
                                 POP     R3
                                 POP     R2
@@ -563,21 +547,25 @@ ChangeCentesimal:   MOV     R1, '0'
                     INC     M[ ScoreC ]
 
 PrintScore:     MOV     R1, 0d
-                MOV     M[ LinhaCursor ], R1
-                MOV     R1, 13d
-                MOV     M[ ColunaCursor ], R1
+                SHL     R1, ROW_SHIFT
+                OR      R1, 13d
+                MOV     M[ PosCursor ], R1
                 MOV     R1, M[ ScoreU ]
                 MOV     M[ Caracter ], R1
                 CALL    ImprimeCaracter
 
-                MOV     R1, 12d
-                MOV     M[ ColunaCursor ], R1
+                MOV     R1, 0d
+                SHL     R1, ROW_SHIFT
+                OR      R1, 12d
+                MOV     M[ PosCursor ], R1
                 MOV     R1, M[ ScoreD ]
                 MOV     M[ Caracter ], R1
                 CALL    ImprimeCaracter
 
-                MOV     R1, 11d
-                MOV     M[ ColunaCursor ], R1
+                MOV     R1, 0d
+                SHL     R1, ROW_SHIFT
+                OR      R1, 11d
+                MOV     M[ PosCursor ], R1
                 MOV     R1, M[ ScoreC ]
                 MOV     M[ Caracter ], R1
                 CALL    ImprimeCaracter
@@ -632,7 +620,7 @@ EndFoodPosLoop: MOV     M[ FoodPos ], R2
                 MOV     M[ PosCursor ], R2
                 MOV     R1, FOOD
                 MOV     M[ Caracter ], R1
-                CALL    ImprimeCaracterV2
+                CALL    ImprimeCaracter
 
                 POP     R3
                 POP     R2
