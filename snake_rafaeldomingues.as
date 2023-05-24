@@ -9,15 +9,15 @@ IO_READ                 EQU     FFFFh
 IO_WRITE                EQU     FFFEh
 IO_STATUS               EQU     FFFDh
 INITIAL_SP              EQU     FDFFh
-CURSOR		            EQU     FFFCh
-CURSOR_INIT		        EQU		FFFFh
+CURSOR		              EQU     FFFCh
+CURSOR_INIT		          EQU		  FFFFh
 INTERRUPTOR             EQU     FFF9h
 WIN_CONDITION           EQU     10d
 
-ROW_POSITION	        EQU		0d
-COL_POSITION	        EQU		0d
-ROW_SHIFT		        EQU		8d
-COLUMN_SHIFT	        EQU		8d
+ROW_POSITION	          EQU		  0d
+COL_POSITION	          EQU		  0d
+ROW_SHIFT		            EQU		  8d
+COLUMN_SHIFT	          EQU		  8d
 
 ; Controle do Timer
 TIMER_START             EQU     FFF7h ; Controla o timer, 0 para e 1 inicia
@@ -102,7 +102,7 @@ HeadAddress             WORD    9000h ; Endereço da cabeça (36864d)
 TailAddress             WORD    9000h ; Endereço da cauda
 
 ; Parametros para rotinas
-TextIndex	            WORD	0d
+TextIndex	              WORD	0d
 Caracter                WORD    ' '
 LastAction              WORD    0d
 PosCursor               WORD    0000h
@@ -522,8 +522,7 @@ EndRepeatAction:        CALL    Move
 ; Entradas: M[Random_Var]
 ; Saidas:   M[Random_Var]
 ;------------------------------------------------------------------------------
-
-RandomV1:	            PUSH	R1
+RandomV1:	              PUSH	R1
 
                         MOV	    R1, LSB_MASK
                         AND	    R1, M[ Random_Var ] ; R1 = bit menos significativo de M[Random_Var]
@@ -646,7 +645,7 @@ EndFoodPosLoop:         MOV     M[ FoodPos ], R2
 ;------------------------------------------------------------------------------
 ; Função Main
 ;------------------------------------------------------------------------------
-Main:			        ENI
+Main:			              ENI
 
                         MOV		R1, INITIAL_SP
                         MOV		SP, R1		 		; We need to initialize the stack
@@ -663,5 +662,5 @@ Main:			        ENI
 
                         CALL    StartTimer
 
-Cycle: 			        BR		Cycle	
+Cycle: 			            BR		Cycle	
 Halt:                   BR		Halt
