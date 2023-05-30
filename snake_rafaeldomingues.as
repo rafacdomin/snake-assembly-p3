@@ -37,7 +37,6 @@ WALL_LEFT               EQU     0000h
 
 ; Posições iniciais
 SNAKE_INITIAL           EQU     0c28h
-FOOD_INITIAL            EQU     0728h
 
 ; Controles
 UP                      EQU     0d
@@ -69,7 +68,7 @@ Mapa3                   STR     '-                                              
 Mapa4                   STR     '-                                                                              -'
 Mapa5                   STR     '-                                                                              -'
 Mapa6                   STR     '-                                                                              -'
-Mapa7                   STR     '-                                       o                                      -'
+Mapa7                   STR     '-                                                                              -'
 Mapa8                   STR     '-                                                                              -'
 Mapa9                   STR     '-                                                                              -'
 Mapa10                  STR     '-                                                                              -'
@@ -141,15 +140,15 @@ ScoreU                  WORD    '0'
 ScoreD                  WORD    '0'
 ScoreC                  WORD    '0'
 
-; Posicao inicial comida
-FoodPos                 WORD    0728h ; linha 7 (0007h) coluna 40 (0028h)
+; Posicao da comida
+FoodPos                 WORD    0000h
 
 ; Posicao da lista
 ; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
 ; Linha 12 (000ch), Coluna 40(0028h)
 NextPos                 WORD    0000h
-HeadAddress             WORD    a000h ; Endereço da cabeça (40960d)
-TailAddress             WORD    a000h ; Endereço da cauda
+HeadAddress             WORD    A000h ; Endereço da cabeça (40960d)
+TailAddress             WORD    A000h ; Endereço da cauda
 
 ; Parametros para rotinas
 TextIndex	              WORD	  0d
@@ -157,7 +156,7 @@ Caracter                WORD    ' '
 LastAction              WORD    0d
 PosCursor               WORD    0000h
 Random_Var	            WORD	  A5A5h  ; 1010 0101 1010 0101
-GameOver                WORD    0d
+GameOver                WORD    FALSE
 
 ;------------------------------------------------------------------------------
 ; ZONA II: definicao de tabela de interrupções
@@ -712,9 +711,6 @@ StartGame:              PUSH    R1
                         MOV     R1, FALSE
                         MOV     M[ GameOver ], R1 ; Define GameOver como falso
 
-                        MOV     R1, FOOD_INITIAL
-                        MOV     M[ FoodPos ], R1 ; Define osicao inicial da comida
-
                         MOV     R1, 0d
                         MOV     M[ Score ], R1
                         MOV     R1, '0'
@@ -733,6 +729,7 @@ StartGame:              PUSH    R1
                         MOV		  M[ TextIndex ], R1
                         CALL    ImprimeTela
 
+                        CALL    SpawnFood
                         CALL    StartTimer
 
                         POP     R2

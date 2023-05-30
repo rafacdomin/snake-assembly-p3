@@ -30,7 +30,6 @@
 	WALL_RIGHT                       004F         CONSTANT
 	WALL_LEFT                        0000         CONSTANT
 	SNAKE_INITIAL                    0C28         CONSTANT
-	FOOD_INITIAL                     0728         CONSTANT
 	UP                               0000         CONSTANT
 	LEFT                             0001         CONSTANT
 	DOWN                             0002         CONSTANT
@@ -124,7 +123,7 @@
 	LastAction                       95EE         VARIABLE
 	PosCursor                        95EF         VARIABLE
 	Random_Var                       95F0         VARIABLE
-	GameOver                         95F1         VARIABLE
+	GameStarted                      95F1         VARIABLE
 	INT0                             FE00         VARIABLE
 	INT1                             FE01         VARIABLE
 	INT2                             FE02         VARIABLE
@@ -150,37 +149,36 @@
 	EndMoveLoop                      00DF            LABEL
 	EndMove                          00EC            LABEL
 	StartTimer                       00F0            LABEL
-	StartTimerEnd                    00FF            LABEL
-	PressUp                          0101            LABEL
-	FimPressUp                       010C            LABEL
-	PressLeft                        010E            LABEL
-	FimPressLeft                     0119            LABEL
-	PressDown                        011B            LABEL
-	FimPressDown                     0126            LABEL
-	PressRight                       0128            LABEL
-	FimPressRight                    0133            LABEL
-	EatFood                          0135            LABEL
-	EatFoodLoop                      013D            LABEL
-	FimEatFoodLoop                   014F            LABEL
-	End_EatFood                      0164            LABEL
-	RepeatAction                     0169            LABEL
-	MoveUp                           0180            LABEL
-	MoveDown                         0186            LABEL
-	MoveLeft                         018C            LABEL
-	MoveRight                        0191            LABEL
-	EndRepeatAction                  0194            LABEL
-	RandomV1                         019B            LABEL
-	Rnd_Rotate                       01A5            LABEL
-	UpdateScore                      01A9            LABEL
-	ChangeDecimal                    01B6            LABEL
-	ChangeCentesimal                 01C4            LABEL
-	PrintScore                       01CA            LABEL
-	SpawnFood                        01F9            LABEL
-	GenerateFood                     01FC            LABEL
-	FoodPosLoop                      0214            LABEL
-	EndFoodPosLoop                   021F            LABEL
-	StartGame                        022D            LABEL
-	Restart                          0261            LABEL
-	Main                             026A            LABEL
-	Cycle                            0274            LABEL
-	Halt                             0275            LABEL
+	PressUp                          00FB            LABEL
+	FimPressUp                       0106            LABEL
+	PressLeft                        0108            LABEL
+	FimPressLeft                     0113            LABEL
+	PressDown                        0115            LABEL
+	FimPressDown                     0120            LABEL
+	PressRight                       0122            LABEL
+	FimPressRight                    012D            LABEL
+	EatFood                          012F            LABEL
+	EatFoodLoop                      0137            LABEL
+	FimEatFoodLoop                   0149            LABEL
+	End_EatFood                      015E            LABEL
+	RepeatAction                     0163            LABEL
+	MoveUp                           017A            LABEL
+	MoveDown                         0180            LABEL
+	MoveLeft                         0186            LABEL
+	MoveRight                        018B            LABEL
+	EndRepeatAction                  018E            LABEL
+	RandomV1                         0195            LABEL
+	Rnd_Rotate                       019F            LABEL
+	UpdateScore                      01A3            LABEL
+	ChangeDecimal                    01B0            LABEL
+	ChangeCentesimal                 01BE            LABEL
+	PrintScore                       01C4            LABEL
+	SpawnFood                        01F3            LABEL
+	GenerateFood                     01F6            LABEL
+	FoodPosLoop                      020E            LABEL
+	EndFoodPosLoop                   0219            LABEL
+	StartGame                        0227            LABEL
+	Restart                          0259            LABEL
+	Main                             0262            LABEL
+	Cycle                            026C            LABEL
+	Halt                             026D            LABEL
