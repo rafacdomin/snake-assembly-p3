@@ -14,7 +14,7 @@ CURSOR_INIT		          EQU		  FFFFh
 INTERRUPTOR             EQU     FFF9h
 TRUE                    EQU     1d
 FALSE                   EQU     0d
-WIN_CONDITION           EQU     1d
+WIN_CONDITION           EQU     5d
 
 ROW_POSITION	          EQU		  0d
 COL_POSITION	          EQU		  0d
@@ -111,7 +111,29 @@ Lose21                   STR     '-                                             
 Lose22                   STR     '-                                                                              -'
 Lose23                   STR     '--------------------------------------------------------------------------------', FIM_TEXTO
 
-WinTexto                STR     'PARABENS, VOCE GANHOU!', FIM_TEXTO
+Win1                     STR     '--------------------------------------------------------------------------------'
+Win2                     STR     '-                                                                              -'
+Win3                     STR     '-                                                                              -'
+Win4                     STR     '-                                                                              -'
+Win5                     STR     '-                                                                              -'
+Win6                     STR     '-                                                                              -'
+Win7                     STR     '-           __  __  ______  __  __       __     __  __  __   __                -'
+Win8                     STR     '-          /\ \_\ \/\  __ \/\ \/\ \     /\ \  _ \ \/\ \/\ "-.\ \               -'
+Win9                     STR     '-          \ \____ \ \ \/\ \ \ \_\ \    \ \ \/ ".\ \ \ \ \ \-.  \              -'
+Win10                    STR     '-           \/\_____\ \_____\ \_____\    \ \__/".~\_\ \_\ \_\\"\_\             -'
+Win11                    STR     '-            \/_____/\/_____/\/_____/     \/_/   \/_/\/_/\/_/ \/_/             -'
+Win12                    STR     '-                                                                              -'
+Win13                    STR     '-                                                                              -'
+Win14                    STR     '-                                                                              -'
+Win15                    STR     '-                                                                              -'
+Win16                    STR     '-                                                                              -'
+Win17                    STR     '-                                                                              -'
+Win18                    STR     '-                                                                              -'
+Win19                    STR     '-                        PRESSIONE "C" PARA JOGAR NOVAMENTE                    -'
+Win20                    STR     '-                                                                              -'
+Win21                    STR     '-                                                                              -'
+Win22                    STR     '-                                                                              -'
+Win23                    STR     '--------------------------------------------------------------------------------', FIM_TEXTO
 
 ; Score (Centena, Dezena, Unidade)
 Score                   WORD    0d
@@ -126,8 +148,8 @@ FoodPos                 WORD    0728h ; linha 7 (0007h) coluna 40 (0028h)
 ; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
 ; Linha 12 (000ch), Coluna 40(0028h)
 NextPos                 WORD    0000h
-HeadAddress             WORD    9000h ; Endereço da cabeça (36864d)
-TailAddress             WORD    9000h ; Endereço da cauda
+HeadAddress             WORD    a000h ; Endereço da cabeça (40960d)
+TailAddress             WORD    a000h ; Endereço da cauda
 
 ; Parametros para rotinas
 TextIndex	              WORD	  0d
@@ -177,36 +199,15 @@ Fim_EndGame:            POP     R1
 ;   Fim de Jogo - Vitoria
 ;------------------------------------------------------------------------------
 WinGame:                PUSH    R1
-                        PUSH    R2
-                        PUSH    R3
 
                         MOV     R1, TRUE
                         MOV     M[ GameOver ], R1
 
-                        MOV     R2, 12d
-                        MOV     R3, 32d
-                        MOV     R1, WinTexto
-                        MOV     M[ TextIndex ], R1            
+                        MOV     R1, Win1
+                        MOV		  M[ TextIndex ], R1
+                        CALL    ImprimeTela
 
-Loop_WinGame:           MOV		  R1, M[ TextIndex ]
-                        MOV		  R1, M[ R1 ]
-                        CMP 	  R1, FIM_TEXTO
-                        JMP.Z	  Fim_WinGame
-
-                        MOV     R2, 12d
-                        SHL     R2, ROW_SHIFT
-                        OR      R2, R3
-                        MOV     M[ PosCursor ], R2
-                        MOV     M[ Caracter ], R1
-                        CALL    ImprimeCaracter
-
-                        INC     M[TextIndex]
-                        INC     R3
-                        JMP     Loop_WinGame
-
-Fim_WinGame:            POP     R3
-                        POP     R2
-                        POP     R1
+Fim_WinGame:            POP     R1
                         RET
 
 ;------------------------------------------------------------------------------
@@ -236,7 +237,7 @@ ImprimeTela:            PUSH    R1
                         MOV     R3, 1d
                         MOV     R4, 0d
 
-Loop1:                  CMP     R3, MAX_ROWS
+LoopImprimeTela:        CMP     R3, MAX_ROWS
                         JMP.Z   FimImprimeTela
 
                         MOV		  R1, M[ TextIndex ]
@@ -256,11 +257,11 @@ Loop1:                  CMP     R3, MAX_ROWS
                         CMP     R4, MAX_COLS
                         JMP.Z   MudaLinha
 
-                        JMP     Loop1
+                        JMP     LoopImprimeTela
 
 MudaLinha:              INC     R3
                         MOV     R4, 0d
-                        JMP     Loop1
+                        JMP     LoopImprimeTela
 
 FimImprimeTela:         POP     R4
                         POP     R3
@@ -513,7 +514,10 @@ FimEatFoodLoop:         MOV     R2, M[ HeadAddress ]
                         CALL    ImprimeCaracter
 
                         CALL    UpdateScore
-                        CALL    SpawnFood
+
+                        MOV     R1, FALSE
+                        CMP     M[ GameOver ], R1
+                        CALL.Z  SpawnFood
                 
 End_EatFood:            POP     R4
                         POP     R3
