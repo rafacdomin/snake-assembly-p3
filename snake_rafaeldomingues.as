@@ -4,7 +4,6 @@
 ;------------------------------------------------------------------------------
 CR                      EQU     0Ah
 FIM_TEXTO               EQU     '@'
-PULA_LINHA              EQU     '#'
 IO_READ                 EQU     FFFFh
 IO_WRITE                EQU     FFFEh
 IO_STATUS               EQU     FFFDh
@@ -12,6 +11,9 @@ INITIAL_SP              EQU     FDFFh
 CURSOR		              EQU     FFFCh
 CURSOR_INIT		          EQU		  FFFFh
 INTERRUPTOR             EQU     FFF9h
+
+GET_ROW                 EQU     ff00h
+GET_COL                 EQU     00ffh
 TRUE                    EQU     1d
 FALSE                   EQU     0d
 WIN_CONDITION           EQU     5d
@@ -46,9 +48,9 @@ RIGHT                   EQU     3d
 
 ; Caracteres usados
 SNAKE_HEAD              EQU     'X'
-SNAKE_BODY              EQU     'x'
+SNAKE_BODY              EQU     'o'
 EMPTY_SPACE             EQU     ' '
-FOOD                    EQU     'o'
+FOOD                    EQU     '*'
 
 ; Padrao de bits para geracao de numero aleatorio
 RND_MASK		            EQU     8016h	; 1000 0000 0001 0110b
@@ -171,6 +173,118 @@ INT4                    WORD    Restart
                         ORIG    FE0Fh
 INT15                   WORD    RepeatAction ; 15 é reservado para o temporizador
 
+
+;------------------------------------------------------------------------------
+; Press: Interrupções para mudar a direção
+;------------------------------------------------------------------------------
+PressUp:                PUSH    R1
+
+                        MOV     R1, M[ LastAction ]
+                        CMP     R1, DOWN
+                        JMP.Z   FimPressUp
+
+                        MOV     R1, UP
+                        MOV     M[ LastAction ], R1
+
+FimPressUp:             POP     R1
+                        RTI
+
+;------------------------------------------------------------------------------
+PressLeft:              PUSH    R1
+
+                        MOV     R1, M[ LastAction ]
+                        CMP     R1, RIGHT
+                        JMP.Z   FimPressLeft
+
+                        MOV     R1, LEFT
+                        MOV     M[ LastAction ], R1
+
+FimPressLeft:           POP     R1
+                        RTI
+
+;------------------------------------------------------------------------------
+PressDown:              PUSH    R1
+
+                        MOV     R1, M[ LastAction ]
+                        CMP     R1, UP
+                        JMP.Z   FimPressDown
+
+                        MOV     R1, DOWN
+                        MOV     M[ LastAction ], R1
+
+FimPressDown:           POP     R1
+                        RTI
+
+;------------------------------------------------------------------------------
+PressRight:             PUSH    R1
+
+                        MOV     R1, M[ LastAction ]
+                        CMP     R1, LEFT
+                        JMP.Z   FimPressRight
+
+                        MOV     R1, RIGHT
+                        MOV     M[ LastAction ], R1
+
+FimPressRight:          POP     R1
+                        RTI
+
+
+;------------------------------------------------------------------------------
+; RepeatAction
+;------------------------------------------------------------------------------
+RepeatAction:           PUSH    R1
+                        PUSH    R2
+                        
+                        MOV     R1, M[ HeadAddress ]
+                        MOV     R1, M[ R1 ]
+                        MOV     R2, M[ LastAction ]
+
+                        CMP     R2, UP
+                        JMP.Z   MoveUp
+
+                        CMP     R2, DOWN
+                        JMP.Z   MoveDown
+
+                        CMP     R2, LEFT
+                        JMP.Z   MoveLeft
+
+                        CMP     R2, RIGHT
+                        JMP.Z   MoveRight
+
+MoveUp:                 SUB     R1, 0100h
+                        MOV     M[ NextPos ], R1
+                        JMP     EndRepeatAction
+
+MoveDown:               ADD     R1, 0100h
+                        MOV     M[ NextPos ], R1
+                        JMP     EndRepeatAction
+
+MoveLeft:               DEC     R1
+                        MOV     M[ NextPos ], R1
+                        JMP     EndRepeatAction
+
+MoveRight:              INC     R1
+                        MOV     M[ NextPos ], R1
+
+EndRepeatAction:        CALL    Move
+                        CALL    StartTimer
+
+                        POP     R2
+                        POP     R1
+                        RTI
+
+;------------------------------------------------------------------------------
+; Restart
+;------------------------------------------------------------------------------
+Restart:                PUSH    R1
+  
+                        MOV     R1, TRUE
+                        CMP     M[ GameOver ], R1
+                        CALL.Z  StartGame
+
+                        POP     R1
+                        RTI
+
 ;------------------------------------------------------------------------------
 ; ZONA IV: codigo
 ;        conjunto de instrucoes Assembly, ordenadas de forma a realizar
@@ -180,33 +294,39 @@ INT15                   WORD    RepeatAction ; 15 é reservado para o temporizad
                         JMP     Main
 
 ;------------------------------------------------------------------------------
-;   Fim de Jogo - Derrota
+; StartTimer: Inicializa o temporizador
 ;------------------------------------------------------------------------------
-EndGame:                PUSH    R1
+StartTimer:             PUSH    R1
 
                         MOV     R1, TRUE
-                        MOV     M[ GameOver ], R1
+                        CMP     M[ GameOver ], R1
+                        JMP.Z   StartTimerEnd
 
-                        MOV     R1, Lose1
-                        MOV		  M[ TextIndex ], R1
-                        CALL    ImprimeTela
+                        MOV     R1, TIMER_MS
+                        MOV     M[ TIMER_INTERVAL ], R1
+                        MOV     R1, 1d
+                        MOV     M[ TIMER_START ], R1
 
-Fim_EndGame:            POP     R1
+StartTimerEnd:          POP     R1
                         RET
 
 ;------------------------------------------------------------------------------
-;   Fim de Jogo - Vitoria
+; Função: RandomV1 (versão 1)
+;
+; Random: Rotina que gera um valor aleatório - guardado em M[Random_Var]
+; Entradas: M[Random_Var]
+; Saidas:   M[Random_Var]
 ;------------------------------------------------------------------------------
-WinGame:                PUSH    R1
+RandomV1:	              PUSH	  R1
 
-                        MOV     R1, TRUE
-                        MOV     M[ GameOver ], R1
+                        MOV	    R1, LSB_MASK
+                        AND	    R1, M[ Random_Var ] ; R1 = bit menos significativo de M[Random_Var]
+                        BR.Z	Rnd_Rotate
+                        MOV	    R1, RND_MASK
+                        XOR	    M[ Random_Var ], R1
 
-                        MOV     R1, Win1
-                        MOV		  M[ TextIndex ], R1
-                        CALL    ImprimeTela
-
-Fim_WinGame:            POP     R1
+Rnd_Rotate:	            ROR	    M[ Random_Var ], 1
+                        POP	    R1
                         RET
 
 ;------------------------------------------------------------------------------
@@ -307,6 +427,36 @@ FimImprimeHeader:       POP     R4
                         RET
 
 ;------------------------------------------------------------------------------
+;   Fim de Jogo - Derrota
+;------------------------------------------------------------------------------
+EndGame:                PUSH    R1
+
+                        MOV     R1, TRUE
+                        MOV     M[ GameOver ], R1
+
+                        MOV     R1, Lose1
+                        MOV		  M[ TextIndex ], R1
+                        CALL    ImprimeTela
+
+Fim_EndGame:            POP     R1
+                        RET
+
+;------------------------------------------------------------------------------
+;   Fim de Jogo - Vitoria
+;------------------------------------------------------------------------------
+WinGame:                PUSH    R1
+
+                        MOV     R1, TRUE
+                        MOV     M[ GameOver ], R1
+
+                        MOV     R1, Win1
+                        MOV		  M[ TextIndex ], R1
+                        CALL    ImprimeTela
+
+Fim_WinGame:            POP     R1
+                        RET
+
+;------------------------------------------------------------------------------
 ;   Move: Rotina para mover a cobra em uma direção
 ;                   Parametros: M[ NextPos ] - Proxima posicao desejada
 ;------------------------------------------------------------------------------
@@ -318,25 +468,25 @@ Move:                   PUSH    R1
                         MOV     R1, M[ NextPos ]
 
                         MOV     R2, R1
-                        AND     R2, ff00h
+                        AND     R2, GET_ROW
                         CMP     R2, WALL_TOP
                         CALL.Z  EndGame
                         JMP.Z   EndMove
 
                         MOV     R2, R1
-                        AND     R2, ff00h
+                        AND     R2, GET_ROW
                         CMP     R2, WALL_BOTTOM
                         CALL.Z  EndGame
                         JMP.Z   EndMove
 
                         MOV     R2, R1
-                        AND     R2, 00ffh
+                        AND     R2, GET_COL
                         CMP     R2, WALL_LEFT
                         CALL.Z  EndGame
                         JMP.Z   EndMove
 
                         MOV     R2, R1
-                        AND     R2, 00ffh
+                        AND     R2, GET_COL
                         CMP     R2, WALL_RIGHT
                         CALL.Z  EndGame
                         JMP.Z   EndMove
@@ -404,77 +554,6 @@ EndMove:                POP     R3
                         RET
 
 ;------------------------------------------------------------------------------
-; StartTimer: Inicializa o temporizador
-;------------------------------------------------------------------------------
-StartTimer:             PUSH    R1
-
-                        MOV     R1, TRUE
-                        CMP     M[ GameOver ], R1
-                        JMP.Z   StartTimerEnd
-
-                        MOV     R1, TIMER_MS
-                        MOV     M[ TIMER_INTERVAL ], R1
-                        MOV     R1, 1d
-                        MOV     M[ TIMER_START ], R1
-
-StartTimerEnd:          POP     R1
-                        RET
-
-;------------------------------------------------------------------------------
-; Press: Interrupções para mudar a direção
-;------------------------------------------------------------------------------
-PressUp:                PUSH    R1
-
-                        MOV     R1, M[ LastAction ]
-                        CMP     R1, DOWN
-                        JMP.Z   FimPressUp
-
-                        MOV     R1, UP
-                        MOV     M[ LastAction ], R1
-
-FimPressUp:             POP     R1
-                        RTI
-
-;------------------------------------------------------------------------------
-PressLeft:              PUSH    R1
-
-                        MOV     R1, M[ LastAction ]
-                        CMP     R1, RIGHT
-                        JMP.Z   FimPressLeft
-
-                        MOV     R1, LEFT
-                        MOV     M[ LastAction ], R1
-
-FimPressLeft:           POP     R1
-                        RTI
-
-;------------------------------------------------------------------------------
-PressDown:              PUSH    R1
-
-                        MOV     R1, M[ LastAction ]
-                        CMP     R1, UP
-                        JMP.Z   FimPressDown
-
-                        MOV     R1, DOWN
-                        MOV     M[ LastAction ], R1
-
-FimPressDown:           POP     R1
-                        RTI
-
-;------------------------------------------------------------------------------
-PressRight:             PUSH    R1
-
-                        MOV     R1, M[ LastAction ]
-                        CMP     R1, LEFT
-                        JMP.Z   FimPressRight
-
-                        MOV     R1, RIGHT
-                        MOV     M[ LastAction ], R1
-
-FimPressRight:          POP     R1
-                        RTI
-
-;------------------------------------------------------------------------------
 ;   Função EatFood
 ;------------------------------------------------------------------------------
 EatFood:                PUSH    R1
@@ -523,70 +602,6 @@ End_EatFood:            POP     R4
                         POP     R2
                         POP     R1
                         RET
-
-;------------------------------------------------------------------------------
-; RepeatAction
-;------------------------------------------------------------------------------
-RepeatAction:           PUSH    R1
-                        PUSH    R2
-                        
-                        MOV     R1, M[ HeadAddress ]
-                        MOV     R1, M[ R1 ]
-                        MOV     R2, M[ LastAction ]
-
-                        CMP     R2, UP
-                        JMP.Z   MoveUp
-
-                        CMP     R2, DOWN
-                        JMP.Z   MoveDown
-
-                        CMP     R2, LEFT
-                        JMP.Z   MoveLeft
-
-                        CMP     R2, RIGHT
-                        JMP.Z   MoveRight
-
-MoveUp:                 SUB     R1, 0100h
-                        MOV     M[ NextPos ], R1
-                        JMP     EndRepeatAction
-
-MoveDown:               ADD     R1, 0100h
-                        MOV     M[ NextPos ], R1
-                        JMP     EndRepeatAction
-
-MoveLeft:               DEC     R1
-                        MOV     M[ NextPos ], R1
-                        JMP     EndRepeatAction
-
-MoveRight:              INC     R1
-                        MOV     M[ NextPos ], R1
-
-EndRepeatAction:        CALL    Move
-                        CALL    StartTimer
-
-                        POP     R2
-                        POP     R1
-                        RTI
-
-;------------------------------------------------------------------------------
-; Função: RandomV1 (versão 1)
-;
-; Random: Rotina que gera um valor aleatório - guardado em M[Random_Var]
-; Entradas: M[Random_Var]
-; Saidas:   M[Random_Var]
-;------------------------------------------------------------------------------
-RandomV1:	              PUSH	  R1
-
-                        MOV	    R1, LSB_MASK
-                        AND	    R1, M[ Random_Var ] ; R1 = bit menos significativo de M[Random_Var]
-                        BR.Z	Rnd_Rotate
-                        MOV	    R1, RND_MASK
-                        XOR	    M[ Random_Var ], R1
-
-Rnd_Rotate:	            ROR	    M[ Random_Var ], 1
-                        POP	    R1
-                        RET
-
 
 ;------------------------------------------------------------------------------
 ;   Função UpdateScore
@@ -735,18 +750,6 @@ StartGame:              PUSH    R1
                         POP     R2
                         POP     R1
                         RET
-
-;------------------------------------------------------------------------------
-; Restart
-;------------------------------------------------------------------------------
-Restart:                PUSH    R1
-  
-                        MOV     R1, TRUE
-                        CMP     M[ GameOver ], R1
-                        CALL.Z  StartGame
-
-                        POP     R1
-                        RTI
 
 ;------------------------------------------------------------------------------
 ; Função Main

@@ -5,7 +5,6 @@
 	==============================|=======|===============
 	CR                               000A         CONSTANT
 	FIM_TEXTO                        0040         CONSTANT
-	PULA_LINHA                       0023         CONSTANT
 	IO_READ                          FFFF         CONSTANT
 	IO_WRITE                         FFFE         CONSTANT
 	IO_STATUS                        FFFD         CONSTANT
@@ -13,6 +12,8 @@
 	CURSOR                           FFFC         CONSTANT
 	CURSOR_INIT                      FFFF         CONSTANT
 	INTERRUPTOR                      FFF9         CONSTANT
+	GET_ROW                          FF00         CONSTANT
+	GET_COL                          00FF         CONSTANT
 	TRUE                             0001         CONSTANT
 	FALSE                            0000         CONSTANT
 	WIN_CONDITION                    0005         CONSTANT
@@ -35,9 +36,9 @@
 	DOWN                             0002         CONSTANT
 	RIGHT                            0003         CONSTANT
 	SNAKE_HEAD                       0058         CONSTANT
-	SNAKE_BODY                       0078         CONSTANT
+	SNAKE_BODY                       006F         CONSTANT
 	EMPTY_SPACE                      0020         CONSTANT
-	FOOD                             006F         CONSTANT
+	FOOD                             002A         CONSTANT
 	RND_MASK                         8016         CONSTANT
 	LSB_MASK                         0001         CONSTANT
 	Header                           8000           STRING
@@ -123,62 +124,63 @@
 	LastAction                       95EE         VARIABLE
 	PosCursor                        95EF         VARIABLE
 	Random_Var                       95F0         VARIABLE
-	GameStarted                      95F1         VARIABLE
+	GameOver                         95F1         VARIABLE
 	INT0                             FE00         VARIABLE
 	INT1                             FE01         VARIABLE
 	INT2                             FE02         VARIABLE
 	INT3                             FE03         VARIABLE
 	INT4                             FE04         VARIABLE
 	INT15                            FE0F         VARIABLE
-	EndGame                          0002            LABEL
-	Fim_EndGame                      000D            LABEL
-	WinGame                          000F            LABEL
-	Fim_WinGame                      001A            LABEL
-	ImprimeCaracter                  001C            LABEL
-	ImprimeTela                      0027            LABEL
-	LoopImprimeTela                  002F            LABEL
-	MudaLinha                        004C            LABEL
-	FimImprimeTela                   0051            LABEL
-	ImprimeHeader                    0056            LABEL
-	ImprimeHeaderLoop                005E            LABEL
-	FimImprimeHeader                 0077            LABEL
-	Move                             007C            LABEL
-	BodyColisionLoop                 00B3            LABEL
-	EndBodyColisionLoop              00BF            LABEL
-	MoveLoop                         00CC            LABEL
-	EndMoveLoop                      00DF            LABEL
-	EndMove                          00EC            LABEL
-	StartTimer                       00F0            LABEL
-	PressUp                          00FB            LABEL
-	FimPressUp                       0106            LABEL
-	PressLeft                        0108            LABEL
-	FimPressLeft                     0113            LABEL
-	PressDown                        0115            LABEL
-	FimPressDown                     0120            LABEL
-	PressRight                       0122            LABEL
-	FimPressRight                    012D            LABEL
-	EatFood                          012F            LABEL
-	EatFoodLoop                      0137            LABEL
-	FimEatFoodLoop                   0149            LABEL
-	End_EatFood                      015E            LABEL
-	RepeatAction                     0163            LABEL
-	MoveUp                           017A            LABEL
-	MoveDown                         0180            LABEL
-	MoveLeft                         0186            LABEL
-	MoveRight                        018B            LABEL
-	EndRepeatAction                  018E            LABEL
-	RandomV1                         0195            LABEL
-	Rnd_Rotate                       019F            LABEL
-	UpdateScore                      01A3            LABEL
-	ChangeDecimal                    01B0            LABEL
-	ChangeCentesimal                 01BE            LABEL
-	PrintScore                       01C4            LABEL
-	SpawnFood                        01F3            LABEL
-	GenerateFood                     01F6            LABEL
-	FoodPosLoop                      020E            LABEL
-	EndFoodPosLoop                   0219            LABEL
-	StartGame                        0227            LABEL
-	Restart                          0259            LABEL
-	Main                             0262            LABEL
-	Cycle                            026C            LABEL
-	Halt                             026D            LABEL
+	PressUp                          FE10            LABEL
+	FimPressUp                       FE1B            LABEL
+	PressLeft                        FE1D            LABEL
+	FimPressLeft                     FE28            LABEL
+	PressDown                        FE2A            LABEL
+	FimPressDown                     FE35            LABEL
+	PressRight                       FE37            LABEL
+	FimPressRight                    FE42            LABEL
+	RepeatAction                     FE44            LABEL
+	MoveUp                           FE5B            LABEL
+	MoveDown                         FE61            LABEL
+	MoveLeft                         FE67            LABEL
+	MoveRight                        FE6C            LABEL
+	EndRepeatAction                  FE6F            LABEL
+	Restart                          FE76            LABEL
+	StartTimer                       0002            LABEL
+	StartTimerEnd                    0011            LABEL
+	RandomV1                         0013            LABEL
+	Rnd_Rotate                       001D            LABEL
+	ImprimeCaracter                  0021            LABEL
+	ImprimeTela                      002C            LABEL
+	LoopImprimeTela                  0034            LABEL
+	MudaLinha                        0051            LABEL
+	FimImprimeTela                   0056            LABEL
+	ImprimeHeader                    005B            LABEL
+	ImprimeHeaderLoop                0063            LABEL
+	FimImprimeHeader                 007C            LABEL
+	EndGame                          0081            LABEL
+	Fim_EndGame                      008C            LABEL
+	WinGame                          008E            LABEL
+	Fim_WinGame                      0099            LABEL
+	Move                             009B            LABEL
+	BodyColisionLoop                 00D2            LABEL
+	EndBodyColisionLoop              00DE            LABEL
+	MoveLoop                         00EB            LABEL
+	EndMoveLoop                      00FE            LABEL
+	EndMove                          010B            LABEL
+	EatFood                          010F            LABEL
+	EatFoodLoop                      0117            LABEL
+	FimEatFoodLoop                   0129            LABEL
+	End_EatFood                      013E            LABEL
+	UpdateScore                      0143            LABEL
+	ChangeDecimal                    0150            LABEL
+	ChangeCentesimal                 015E            LABEL
+	PrintScore                       0164            LABEL
+	SpawnFood                        0193            LABEL
+	GenerateFood                     0196            LABEL
+	FoodPosLoop                      01AE            LABEL
+	EndFoodPosLoop                   01B9            LABEL
+	StartGame                        01C7            LABEL
+	Main                             01F9            LABEL
+	Cycle                            0203            LABEL
+	Halt                             0204            LABEL
