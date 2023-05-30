@@ -12,7 +12,9 @@ INITIAL_SP              EQU     FDFFh
 CURSOR		              EQU     FFFCh
 CURSOR_INIT		          EQU		  FFFFh
 INTERRUPTOR             EQU     FFF9h
-WIN_CONDITION           EQU     10d
+TRUE                    EQU     1d
+FALSE                   EQU     0d
+WIN_CONDITION           EQU     1d
 
 ROW_POSITION	          EQU		  0d
 COL_POSITION	          EQU		  0d
@@ -32,6 +34,10 @@ WALL_TOP                EQU     0100h
 WALL_BOTTOM             EQU     1700h
 WALL_RIGHT              EQU     004fh
 WALL_LEFT               EQU     0000h
+
+; Posições iniciais
+SNAKE_INITIAL           EQU     0c28h
+FOOD_INITIAL            EQU     0728h
 
 ; Controles
 UP                      EQU     0d
@@ -97,7 +103,6 @@ FoodPos                 WORD    0728h ; linha 7 (0007h) coluna 40 (0028h)
 ; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
 ; Linha 12 (000ch), Coluna 40(0028h)
 NextPos                 WORD    0000h
-InitialPos              WORD    0c28h
 HeadAddress             WORD    9000h ; Endereço da cabeça (36864d)
 TailAddress             WORD    9000h ; Endereço da cauda
 
@@ -107,6 +112,7 @@ Caracter                WORD    ' '
 LastAction              WORD    0d
 PosCursor               WORD    0000h
 Random_Var	            WORD	  A5A5h  ; 1010 0101 1010 0101
+GameOver                WORD    0d
 
 ;------------------------------------------------------------------------------
 ; ZONA II: definicao de tabela de interrupções
@@ -116,6 +122,7 @@ INT0                    WORD    PressUp
 INT1                    WORD    PressLeft
 INT2                    WORD    PressDown
 INT3                    WORD    PressRight
+INT4                    WORD    Restart
 
                         ORIG    FE0Fh
 INT15                   WORD    RepeatAction ; 15 é reservado para o temporizador
@@ -135,6 +142,9 @@ EndGame:                PUSH    R1
                         PUSH    R2
                         PUSH    R3
                         PUSH    R4
+
+                        MOV     R1, TRUE
+                        MOV     M[ GameOver ], R1
 
                         MOV     R2, 10d
                         MOV     R3, 35d
@@ -171,7 +181,7 @@ Fim_EndGame:            POP     R4
                         POP     R3
                         POP     R2
                         POP     R1
-                        CALL    Cycle
+                        RET
 
 ;------------------------------------------------------------------------------
 ;   Fim de Jogo - Vitoria
@@ -179,6 +189,9 @@ Fim_EndGame:            POP     R4
 WinGame:                PUSH    R1
                         PUSH    R2
                         PUSH    R3
+
+                        MOV     R1, TRUE
+                        MOV     M[ GameOver ], R1
 
                         MOV     R2, 12d
                         MOV     R3, 32d
@@ -204,7 +217,7 @@ Loop_WinGame:           MOV		  R1, M[ TextIndex ]
 Fim_WinGame:            POP     R3
                         POP     R2
                         POP     R1
-                        CALL    Cycle
+                        RET
 
 ;------------------------------------------------------------------------------
 ; ImprimeCaracter:
@@ -281,21 +294,25 @@ Move:                   PUSH    R1
                         AND     R2, ff00h
                         CMP     R2, WALL_TOP
                         CALL.Z  EndGame
+                        JMP.Z   EndMove
 
                         MOV     R2, R1
                         AND     R2, ff00h
                         CMP     R2, WALL_BOTTOM
                         CALL.Z  EndGame
+                        JMP.Z   EndMove
 
                         MOV     R2, R1
                         AND     R2, 00ffh
                         CMP     R2, WALL_LEFT
                         CALL.Z  EndGame
+                        JMP.Z   EndMove
 
                         MOV     R2, R1
                         AND     R2, 00ffh
                         CMP     R2, WALL_RIGHT
                         CALL.Z  EndGame
+                        JMP.Z   EndMove
 
                         ; Verifica se a proxima posição é uma comida
                         MOV     R1, M[ NextPos ]
@@ -313,6 +330,7 @@ BodyColisionLoop:       CMP     R2, M[ HeadAddress ]
 
                         CMP     R1, M[ R2 ]
                         CALL.Z  EndGame
+                        JMP.Z   EndMove
 
                         DEC     R2
                         JMP     BodyColisionLoop
@@ -363,12 +381,16 @@ EndMove:                POP     R3
 ;------------------------------------------------------------------------------
 StartTimer:             PUSH    R1
 
+                        MOV     R1, TRUE
+                        CMP     M[ GameOver ], R1
+                        JMP.Z   StartTimerEnd
+
                         MOV     R1, TIMER_MS
                         MOV     M[ TIMER_INTERVAL ], R1
                         MOV     R1, 1d
                         MOV     M[ TIMER_START ], R1
 
-                        POP     R1
+StartTimerEnd:          POP     R1
                         RET
 
 ;------------------------------------------------------------------------------
@@ -483,16 +505,16 @@ RepeatAction:           PUSH    R1
                         MOV     R2, M[ LastAction ]
 
                         CMP     R2, UP
-                        JMP.Z  MoveUp
+                        JMP.Z   MoveUp
 
                         CMP     R2, DOWN
-                        JMP.Z  MoveDown
+                        JMP.Z   MoveDown
 
                         CMP     R2, LEFT
                         JMP.Z   MoveLeft
 
                         CMP     R2, RIGHT
-                        JMP.Z  MoveRight
+                        JMP.Z   MoveRight
 
 MoveUp:                 SUB     R1, 0100h
                         MOV     M[ NextPos ], R1
@@ -511,6 +533,7 @@ MoveRight:              INC     R1
 
 EndRepeatAction:        CALL    Move
                         CALL    StartTimer
+
                         POP     R2
                         POP     R1
                         RTI
@@ -643,6 +666,57 @@ EndFoodPosLoop:         MOV     M[ FoodPos ], R2
                         RET
 
 ;------------------------------------------------------------------------------
+; StartGame: Inicializa as variaveis do jogo (cobra, fruta, pontuação)
+;------------------------------------------------------------------------------
+StartGame:              PUSH    R1
+                        PUSH    R2
+
+                        MOV     R1, M[ HeadAddress ]
+                        MOV     M[TailAddress], R1 ; Zera tamanho da cobra
+
+                        MOV     R1, SNAKE_INITIAL
+                        MOV     R2, M[ HeadAddress ]
+                        MOV     M[ R2 ], R1 ; Guarda posicao inicial da cobra no inicio da lista
+
+                        MOV     R1, FALSE
+                        MOV     M[ GameOver ], R1 ; Define GameOver como falso
+
+                        MOV     R1, FOOD_INITIAL
+                        MOV     M[ FoodPos ], R1 ; Define osicao inicial da comida
+
+                        MOV     R1, 0d
+                        MOV     M[ Score ], R1
+                        MOV     R1, '0'
+                        MOV     M[ ScoreU ], R1
+                        MOV     M[ ScoreD ], R1
+                        MOV     M[ ScoreC ], R1 ; Zera scoreboard
+
+                        MOV     R1, UP
+                        MOV     M[ LastAction ], R1 ; Define Primeira ação como UP
+
+                        MOV     R1, Mapa0
+                        MOV		  M[ TextIndex ], R1
+                        CALL    ImprimeMapa
+
+                        CALL    StartTimer
+
+                        POP     R2
+                        POP     R1
+                        RET
+
+;------------------------------------------------------------------------------
+; Restart
+;------------------------------------------------------------------------------
+Restart:                PUSH    R1
+  
+                        MOV     R1, TRUE
+                        CMP     M[ GameOver ], R1
+                        CALL.Z  StartGame
+
+                        POP     R1
+                        RTI
+
+;------------------------------------------------------------------------------
 ; Função Main
 ;------------------------------------------------------------------------------
 Main:			              ENI
@@ -652,15 +726,7 @@ Main:			              ENI
                         MOV		  R1, CURSOR_INIT		; We need to initialize the cursor 
                         MOV		  M[ CURSOR ], R1		; with value CURSOR_INIT
                         
-                        MOV     R1, Mapa0
-                        MOV		  M[ TextIndex ], R1
-                        CALL    ImprimeMapa
-
-                        MOV     R1, M[ InitialPos ]
-                        MOV     R2, M[ HeadAddress ]
-                        MOV     M[ R2 ], R1 ; Guarda posicao inicial da cobra no inicio da lista
-
-                        CALL    StartTimer
+                        CALL    StartGame
 
 Cycle: 			            BR		Cycle	
 Halt:                   BR		Halt
