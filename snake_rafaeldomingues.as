@@ -46,8 +46,8 @@ EMPTY_SPACE             EQU     ' '
 FOOD                    EQU     'o'
 
 ; Padrao de bits para geracao de numero aleatorio
-RND_MASK		        EQU     8016h	; 1000 0000 0001 0110b
-LSB_MASK		        EQU	    0001h	; Mascara para testar o bit menos significativo do Random_Var
+RND_MASK		            EQU     8016h	; 1000 0000 0001 0110b
+LSB_MASK		            EQU	    0001h	; Mascara para testar o bit menos significativo do Random_Var
 
 ;------------------------------------------------------------------------------
 ; ZONA II: definicao de variaveis
@@ -102,11 +102,11 @@ HeadAddress             WORD    9000h ; Endereço da cabeça (36864d)
 TailAddress             WORD    9000h ; Endereço da cauda
 
 ; Parametros para rotinas
-TextIndex	              WORD	0d
+TextIndex	              WORD	  0d
 Caracter                WORD    ' '
 LastAction              WORD    0d
 PosCursor               WORD    0000h
-Random_Var	            WORD	A5A5h  ; 1010 0101 1010 0101
+Random_Var	            WORD	  A5A5h  ; 1010 0101 1010 0101
 
 ;------------------------------------------------------------------------------
 ; ZONA II: definicao de tabela de interrupções
@@ -141,15 +141,15 @@ EndGame:                PUSH    R1
                         MOV     R1, FimTexto0
                         MOV     M[ TextIndex ], R1            
 
-Loop_EndGame:           MOV		R1, M[ TextIndex ]
-                        MOV		R1, M[ R1 ]
-                        CMP 	R1, FIM_TEXTO
-                        JMP.Z	Fim_EndGame
+Loop_EndGame:           MOV		  R1, M[ TextIndex ]
+                        MOV		  R1, M[ R1 ]
+                        CMP 	  R1, FIM_TEXTO
+                        JMP.Z	  Fim_EndGame
 
-                        MOV		R1, M[ TextIndex ]
-                        MOV		R1, M[ R1 ]
-                        CMP 	R1, PULA_LINHA
-                        JMP.Z	Linha_EndGame
+                        MOV		  R1, M[ TextIndex ]
+                        MOV		  R1, M[ R1 ]
+                        CMP 	  R1, PULA_LINHA
+                        JMP.Z	  Linha_EndGame
 
                         MOV     R4, R2
                         SHL     R4, ROW_SHIFT
@@ -185,10 +185,10 @@ WinGame:                PUSH    R1
                         MOV     R1, WinTexto
                         MOV     M[ TextIndex ], R1            
 
-Loop_WinGame:           MOV		R1, M[ TextIndex ]
-                        MOV		R1, M[ R1 ]
-                        CMP 	R1, FIM_TEXTO
-                        JMP.Z	Fim_WinGame
+Loop_WinGame:           MOV		  R1, M[ TextIndex ]
+                        MOV		  R1, M[ R1 ]
+                        CMP 	  R1, FIM_TEXTO
+                        JMP.Z	  Fim_WinGame
 
                         MOV     R2, 12d
                         SHL     R2, ROW_SHIFT
@@ -211,7 +211,7 @@ Fim_WinGame:            POP     R3
 ;               Parametros: M[ PosCursor ] - Posição Cursor
 ;                           M[ Caracter ] - caratere a ser imprimido
 ;------------------------------------------------------------------------------
-ImprimeCaracter:        PUSH R1
+ImprimeCaracter:        PUSH    R1
 
                         MOV     R1, M[ PosCursor ]
                         MOV     M[ CURSOR ], R1
@@ -236,20 +236,20 @@ ImprimeMapa:            PUSH    R1
 Loop1:                  CMP     R3, MAX_ROWS
                         JMP.Z   FimImprimeMapa
 
-                        MOV		R1, M[ TextIndex ]
-                        MOV		R1, M[ R1 ]
-                        CMP 	R1, FIM_TEXTO
-                        JMP.Z	FimImprimeMapa
+                        MOV		  R1, M[ TextIndex ]
+                        MOV		  R1, M[ R1 ]
+                        CMP 	  R1, FIM_TEXTO
+                        JMP.Z	  FimImprimeMapa
 
                         MOV     R2, R3
                         SHL     R2, ROW_SHIFT
                         OR      R2, R4
-                        MOV		M[ PosCursor ], R2
+                        MOV		  M[ PosCursor ], R2
                         MOV     M[ Caracter ], R1
                         CALL    ImprimeCaracter
 
-                        INC		M[ TextIndex ] ; Muda de caracter
-                        INC		R4 ; Muda de coluna
+                        INC		  M[ TextIndex ] ; Muda de caracter
+                        INC		  R4 ; Muda de coluna
                         CMP     R4, MAX_COLS
                         JMP.Z   MudaLinha
 
@@ -522,7 +522,7 @@ EndRepeatAction:        CALL    Move
 ; Entradas: M[Random_Var]
 ; Saidas:   M[Random_Var]
 ;------------------------------------------------------------------------------
-RandomV1:	              PUSH	R1
+RandomV1:	              PUSH	  R1
 
                         MOV	    R1, LSB_MASK
                         AND	    R1, M[ Random_Var ] ; R1 = bit menos significativo de M[Random_Var]
@@ -647,13 +647,13 @@ EndFoodPosLoop:         MOV     M[ FoodPos ], R2
 ;------------------------------------------------------------------------------
 Main:			              ENI
 
-                        MOV		R1, INITIAL_SP
-                        MOV		SP, R1		 		; We need to initialize the stack
-                        MOV		R1, CURSOR_INIT		; We need to initialize the cursor 
-                        MOV		M[ CURSOR ], R1		; with value CURSOR_INIT
+                        MOV		  R1, INITIAL_SP
+                        MOV		  SP, R1		 		; We need to initialize the stack
+                        MOV		  R1, CURSOR_INIT		; We need to initialize the cursor 
+                        MOV		  M[ CURSOR ], R1		; with value CURSOR_INIT
                         
                         MOV     R1, Mapa0
-                        MOV		M[ TextIndex ], R1
+                        MOV		  M[ TextIndex ], R1
                         CALL    ImprimeMapa
 
                         MOV     R1, M[ InitialPos ]
