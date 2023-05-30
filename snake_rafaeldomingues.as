@@ -61,7 +61,8 @@ LSB_MASK		            EQU	    0001h	; Mascara para testar o bit menos significat
 ;                              STR  - sequencia de caracteres (cada ocupa 1 palavra: 16 bits).
 ;          Cada caracter ocupa 1 palavra
                         ORIG    8000h
-Mapa0                   STR     'PONTUACAO: 000                        SNAKE                                     '
+Header                  STR     'PONTUACAO: 000                        SNAKE                                     ', FIM_TEXTO
+
 Mapa1                   STR     '--------------------------------------------------------------------------------'
 Mapa2                   STR     '-                                                                              -'
 Mapa3                   STR     '-                                                                              -'
@@ -86,8 +87,30 @@ Mapa21                  STR     '-                                              
 Mapa22                  STR     '-                                                                              -'
 Mapa23                  STR     '--------------------------------------------------------------------------------', FIM_TEXTO
 
-FimTexto0               STR     'FIM DE JOGO', PULA_LINHA
-FimTexto1               STR     'VOCE PERDEU!', FIM_TEXTO
+Lose1                    STR     '--------------------------------------------------------------------------------'
+Lose2                    STR     '-                                                                              -'
+Lose3                    STR     '-                                                                              -'
+Lose4                    STR     '-     ______  ______  __    __  ______                                         -'
+Lose5                    STR     '-    /\  ___\/\  __ \/\ "-./  \/\  ___\                                        -'
+Lose6                    STR     '-    \ \ \__ \ \  __ \ \ \-./\ \ \  __\                                        -'
+Lose7                    STR     '-     \ \_____\ \_\ \_\ \_\ \ \_\ \_____\                                      -'
+Lose8                    STR     '-      \/_____/\/_/\/_/\/_/  \/_/\/_____/                                      -'
+Lose9                    STR     '-                                                                              -'
+Lose10                   STR     '-                                      ______  __   ________  ______           -'
+Lose11                   STR     '-                                     /\  __ \/\ \ / /\  ___\/\  == \          -'
+Lose12                   STR     '-                                     \ \ \/\ \ \ \ /\ \  __\\ \  __<          -'
+Lose13                   STR     '-                                      \ \_____\ \__| \ \_____\ \_\ \_\        -'
+Lose14                   STR     '-                                       \/_____/\/_/   \/_____/\/_/ /_/        -'
+Lose15                   STR     '-                                                                              -'
+Lose16                   STR     '-                                                                              -'
+Lose17                   STR     '-                                                                              -'
+Lose18                   STR     '-                                                                              -'
+Lose19                   STR     '-                        PRESSIONE "C" PARA JOGAR NOVAMENTE                    -'
+Lose20                   STR     '-                                                                              -'
+Lose21                   STR     '-                                                                              -'
+Lose22                   STR     '-                                                                              -'
+Lose23                   STR     '--------------------------------------------------------------------------------', FIM_TEXTO
+
 WinTexto                STR     'PARABENS, VOCE GANHOU!', FIM_TEXTO
 
 ; Score (Centena, Dezena, Unidade)
@@ -139,48 +162,15 @@ INT15                   WORD    RepeatAction ; 15 é reservado para o temporizad
 ;   Fim de Jogo - Derrota
 ;------------------------------------------------------------------------------
 EndGame:                PUSH    R1
-                        PUSH    R2
-                        PUSH    R3
-                        PUSH    R4
 
                         MOV     R1, TRUE
                         MOV     M[ GameOver ], R1
 
-                        MOV     R2, 10d
-                        MOV     R3, 35d
-                        MOV     R1, FimTexto0
-                        MOV     M[ TextIndex ], R1            
+                        MOV     R1, Lose1
+                        MOV		  M[ TextIndex ], R1
+                        CALL    ImprimeTela
 
-Loop_EndGame:           MOV		  R1, M[ TextIndex ]
-                        MOV		  R1, M[ R1 ]
-                        CMP 	  R1, FIM_TEXTO
-                        JMP.Z	  Fim_EndGame
-
-                        MOV		  R1, M[ TextIndex ]
-                        MOV		  R1, M[ R1 ]
-                        CMP 	  R1, PULA_LINHA
-                        JMP.Z	  Linha_EndGame
-
-                        MOV     R4, R2
-                        SHL     R4, ROW_SHIFT
-                        OR      R4, R3
-                        MOV     M[ PosCursor ], R4
-                        MOV     M[ Caracter ], R1
-                        CALL    ImprimeCaracter
-
-                        INC     M[ TextIndex ]
-                        INC     R3
-                        JMP     Loop_EndGame
-
-Linha_EndGame:          INC     R2
-                        MOV     R3, 35d
-                        INC     M[ TextIndex ]
-                        JMP     Loop_EndGame
-
-Fim_EndGame:            POP     R4
-                        POP     R3
-                        POP     R2
-                        POP     R1
+Fim_EndGame:            POP     R1
                         RET
 
 ;------------------------------------------------------------------------------
@@ -235,24 +225,24 @@ ImprimeCaracter:        PUSH    R1
                         RET
 
 ;------------------------------------------------------------------------------
-; ImprimeMapa
+; ImprimeTela
 ;           Parametros: M[ TextIndex ] - Posição inicial do texto
 ;------------------------------------------------------------------------------
-ImprimeMapa:            PUSH    R1
+ImprimeTela:            PUSH    R1
                         PUSH    R2
                         PUSH    R3 ; Controla linha
                         PUSH    R4 ; Controla coluna
 
-                        MOV     R3, 0d
+                        MOV     R3, 1d
                         MOV     R4, 0d
 
 Loop1:                  CMP     R3, MAX_ROWS
-                        JMP.Z   FimImprimeMapa
+                        JMP.Z   FimImprimeTela
 
                         MOV		  R1, M[ TextIndex ]
                         MOV		  R1, M[ R1 ]
                         CMP 	  R1, FIM_TEXTO
-                        JMP.Z	  FimImprimeMapa
+                        JMP.Z	  FimImprimeTela
 
                         MOV     R2, R3
                         SHL     R2, ROW_SHIFT
@@ -272,12 +262,49 @@ MudaLinha:              INC     R3
                         MOV     R4, 0d
                         JMP     Loop1
 
-FimImprimeMapa:         POP     R4
+FimImprimeTela:         POP     R4
                         POP     R3
                         POP     R2
                         POP     R1
                         RET
 
+;------------------------------------------------------------------------------
+; ImprimeHeader
+;           Parametros: M[ TextIndex ] - Posição inicial do texto
+;------------------------------------------------------------------------------
+ImprimeHeader:          PUSH    R1
+                        PUSH    R2
+                        PUSH    R3 ; Controla linha
+                        PUSH    R4 ; Controla coluna
+
+                        MOV     R3, 0d
+                        MOV     R4, 0d
+
+ImprimeHeaderLoop:      CMP     R4, MAX_COLS
+                        JMP.Z   FimImprimeHeader
+                        
+                        MOV		  R1, M[ TextIndex ]
+                        MOV		  R1, M[ R1 ]
+                        CMP 	  R1, FIM_TEXTO
+                        JMP.Z	  FimImprimeHeader
+
+                        MOV     R2, R3
+                        SHL     R2, ROW_SHIFT
+                        OR      R2, R4
+                        MOV		  M[ PosCursor ], R2
+                        MOV     M[ Caracter ], R1
+                        CALL    ImprimeCaracter
+
+                        INC		  M[ TextIndex ] ; Muda de caracter
+                        INC		  R4 ; Muda de coluna
+
+                        JMP     ImprimeHeaderLoop
+
+FimImprimeHeader:       POP     R4
+                        POP     R3
+                        POP     R2
+                        POP     R1
+                        RET
 
 ;------------------------------------------------------------------------------
 ;   Move: Rotina para mover a cobra em uma direção
@@ -694,9 +721,13 @@ StartGame:              PUSH    R1
                         MOV     R1, UP
                         MOV     M[ LastAction ], R1 ; Define Primeira ação como UP
 
-                        MOV     R1, Mapa0
+                        MOV     R1, Header
                         MOV		  M[ TextIndex ], R1
-                        CALL    ImprimeMapa
+                        CALL    ImprimeHeader
+
+                        MOV     R1, Mapa1
+                        MOV		  M[ TextIndex ], R1
+                        CALL    ImprimeTela
 
                         CALL    StartTimer
 
