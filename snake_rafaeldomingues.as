@@ -14,9 +14,10 @@ INTERRUPTOR             EQU     FFF9h
 
 GET_ROW                 EQU     ff00h
 GET_COL                 EQU     00ffh
+CHANGE_ROW              EQU     0100h
 TRUE                    EQU     1d
 FALSE                   EQU     0d
-WIN_CONDITION           EQU     5d
+WIN_CONDITION           EQU     15d
 
 ROW_POSITION	          EQU		  0d
 COL_POSITION	          EQU		  0d
@@ -37,7 +38,12 @@ WALL_BOTTOM             EQU     1700h
 WALL_RIGHT              EQU     004fh
 WALL_LEFT               EQU     0000h
 
-; Posições iniciais
+; Posição do Scoreboard
+SCORE_U                 EQU     000dh
+SCORE_D                 EQU     000ch
+SCORE_C                 EQU     000bh
+
+; Posição inicial da cobra
 SNAKE_INITIAL           EQU     0c28h
 
 ; Controles
@@ -88,53 +94,53 @@ Mapa21                  STR     '-                                              
 Mapa22                  STR     '-                                                                              -'
 Mapa23                  STR     '--------------------------------------------------------------------------------', FIM_TEXTO
 
-Lose1                    STR     '--------------------------------------------------------------------------------'
-Lose2                    STR     '-                                                                              -'
-Lose3                    STR     '-                                                                              -'
-Lose4                    STR     '-     ______  ______  __    __  ______                                         -'
-Lose5                    STR     '-    /\  ___\/\  __ \/\ "-./  \/\  ___\                                        -'
-Lose6                    STR     '-    \ \ \__ \ \  __ \ \ \-./\ \ \  __\                                        -'
-Lose7                    STR     '-     \ \_____\ \_\ \_\ \_\ \ \_\ \_____\                                      -'
-Lose8                    STR     '-      \/_____/\/_/\/_/\/_/  \/_/\/_____/                                      -'
-Lose9                    STR     '-                                                                              -'
-Lose10                   STR     '-                                      ______  __   ________  ______           -'
-Lose11                   STR     '-                                     /\  __ \/\ \ / /\  ___\/\  == \          -'
-Lose12                   STR     '-                                     \ \ \/\ \ \ \ /\ \  __\\ \  __<          -'
-Lose13                   STR     '-                                      \ \_____\ \__| \ \_____\ \_\ \_\        -'
-Lose14                   STR     '-                                       \/_____/\/_/   \/_____/\/_/ /_/        -'
-Lose15                   STR     '-                                                                              -'
-Lose16                   STR     '-                                                                              -'
-Lose17                   STR     '-                                                                              -'
-Lose18                   STR     '-                                                                              -'
-Lose19                   STR     '-                        PRESSIONE "C" PARA JOGAR NOVAMENTE                    -'
-Lose20                   STR     '-                                                                              -'
-Lose21                   STR     '-                                                                              -'
-Lose22                   STR     '-                                                                              -'
-Lose23                   STR     '--------------------------------------------------------------------------------', FIM_TEXTO
+Lose1                   STR     '--------------------------------------------------------------------------------'
+Lose2                   STR     '-                                                                              -'
+Lose3                   STR     '-                                                                              -'
+Lose4                   STR     '-     ______  ______  __    __  ______                                         -'
+Lose5                   STR     '-    /\  ___\/\  __ \/\ "-./  \/\  ___\                                        -'
+Lose6                   STR     '-    \ \ \__ \ \  __ \ \ \-./\ \ \  __\                                        -'
+Lose7                   STR     '-     \ \_____\ \_\ \_\ \_\ \ \_\ \_____\                                      -'
+Lose8                   STR     '-      \/_____/\/_/\/_/\/_/  \/_/\/_____/                                      -'
+Lose9                   STR     '-                                                                              -'
+Lose10                  STR     '-                                      ______  __   ________  ______           -'
+Lose11                  STR     '-                                     /\  __ \/\ \ / /\  ___\/\  == \          -'
+Lose12                  STR     '-                                     \ \ \/\ \ \ \ /\ \  __\\ \  __<          -'
+Lose13                  STR     '-                                      \ \_____\ \__| \ \_____\ \_\ \_\        -'
+Lose14                  STR     '-                                       \/_____/\/_/   \/_____/\/_/ /_/        -'
+Lose15                  STR     '-                                                                              -'
+Lose16                  STR     '-                                                                              -'
+Lose17                  STR     '-                                                                              -'
+Lose18                  STR     '-                                                                              -'
+Lose19                  STR     '-                        PRESSIONE "C" PARA JOGAR NOVAMENTE                    -'
+Lose20                  STR     '-                                                                              -'
+Lose21                  STR     '-                                                                              -'
+Lose22                  STR     '-                                                                              -'
+Lose23                  STR     '--------------------------------------------------------------------------------', FIM_TEXTO
 
-Win1                     STR     '--------------------------------------------------------------------------------'
-Win2                     STR     '-                                                                              -'
-Win3                     STR     '-                                                                              -'
-Win4                     STR     '-                                                                              -'
-Win5                     STR     '-                                                                              -'
-Win6                     STR     '-                                                                              -'
-Win7                     STR     '-           __  __  ______  __  __       __     __  __  __   __                -'
-Win8                     STR     '-          /\ \_\ \/\  __ \/\ \/\ \     /\ \  _ \ \/\ \/\ "-.\ \               -'
-Win9                     STR     '-          \ \____ \ \ \/\ \ \ \_\ \    \ \ \/ ".\ \ \ \ \ \-.  \              -'
-Win10                    STR     '-           \/\_____\ \_____\ \_____\    \ \__/".~\_\ \_\ \_\\"\_\             -'
-Win11                    STR     '-            \/_____/\/_____/\/_____/     \/_/   \/_/\/_/\/_/ \/_/             -'
-Win12                    STR     '-                                                                              -'
-Win13                    STR     '-                                                                              -'
-Win14                    STR     '-                                                                              -'
-Win15                    STR     '-                                                                              -'
-Win16                    STR     '-                                                                              -'
-Win17                    STR     '-                                                                              -'
-Win18                    STR     '-                                                                              -'
-Win19                    STR     '-                        PRESSIONE "C" PARA JOGAR NOVAMENTE                    -'
-Win20                    STR     '-                                                                              -'
-Win21                    STR     '-                                                                              -'
-Win22                    STR     '-                                                                              -'
-Win23                    STR     '--------------------------------------------------------------------------------', FIM_TEXTO
+Win1                    STR     '--------------------------------------------------------------------------------'
+Win2                    STR     '-                                                                              -'
+Win3                    STR     '-                                                                              -'
+Win4                    STR     '-                                                                              -'
+Win5                    STR     '-                                                                              -'
+Win6                    STR     '-                                                                              -'
+Win7                    STR     '-           __  __  ______  __  __       __     __  __  __   __                -'
+Win8                    STR     '-          /\ \_\ \/\  __ \/\ \/\ \     /\ \  _ \ \/\ \/\ "-.\ \               -'
+Win9                    STR     '-          \ \____ \ \ \/\ \ \ \_\ \    \ \ \/ ".\ \ \ \ \ \-.  \              -'
+Win10                   STR     '-           \/\_____\ \_____\ \_____\    \ \__/".~\_\ \_\ \_\\"\_\             -'
+Win11                   STR     '-            \/_____/\/_____/\/_____/     \/_/   \/_/\/_/\/_/ \/_/             -'
+Win12                   STR     '-                                                                              -'
+Win13                   STR     '-                                                                              -'
+Win14                   STR     '-                                                                              -'
+Win15                   STR     '-                                                                              -'
+Win16                   STR     '-                                                                              -'
+Win17                   STR     '-                                                                              -'
+Win18                   STR     '-                                                                              -'
+Win19                   STR     '-                        PRESSIONE "C" PARA JOGAR NOVAMENTE                    -'
+Win20                   STR     '-                                                                              -'
+Win21                   STR     '-                                                                              -'
+Win22                   STR     '-                                                                              -'
+Win23                   STR     '--------------------------------------------------------------------------------', FIM_TEXTO
 
 ; Score (Centena, Dezena, Unidade)
 Score                   WORD    0d
@@ -146,8 +152,6 @@ ScoreC                  WORD    '0'
 FoodPos                 WORD    0000h
 
 ; Posicao da lista
-; Fazer uma lista de posições 2 a 2 com a linha e coluna das posições da cobra, a cada movimento deletar a ultima posição e mover todas as posições para sobreescrever
-; Linha 12 (000ch), Coluna 40(0028h)
 NextPos                 WORD    0000h
 HeadAddress             WORD    A000h ; Endereço da cabeça (40960d)
 TailAddress             WORD    A000h ; Endereço da cauda
@@ -179,6 +183,7 @@ INT15                   WORD    RepeatAction ; 15 é reservado para o temporizad
 ;------------------------------------------------------------------------------
 PressUp:                PUSH    R1
 
+                        ; Impede movimento no sentido contrário
                         MOV     R1, M[ LastAction ]
                         CMP     R1, DOWN
                         JMP.Z   FimPressUp
@@ -192,6 +197,7 @@ FimPressUp:             POP     R1
 ;------------------------------------------------------------------------------
 PressLeft:              PUSH    R1
 
+                        ; Impede movimento no sentido contrário
                         MOV     R1, M[ LastAction ]
                         CMP     R1, RIGHT
                         JMP.Z   FimPressLeft
@@ -205,6 +211,7 @@ FimPressLeft:           POP     R1
 ;------------------------------------------------------------------------------
 PressDown:              PUSH    R1
 
+                        ; Impede movimento no sentido contrário
                         MOV     R1, M[ LastAction ]
                         CMP     R1, UP
                         JMP.Z   FimPressDown
@@ -218,6 +225,7 @@ FimPressDown:           POP     R1
 ;------------------------------------------------------------------------------
 PressRight:             PUSH    R1
 
+                        ; Impede movimento no sentido contrário
                         MOV     R1, M[ LastAction ]
                         CMP     R1, LEFT
                         JMP.Z   FimPressRight
@@ -230,7 +238,7 @@ FimPressRight:          POP     R1
 
 
 ;------------------------------------------------------------------------------
-; RepeatAction
+; RepeatAction: Repete o ultimo movimento feito pela cobra
 ;------------------------------------------------------------------------------
 RepeatAction:           PUSH    R1
                         PUSH    R2
@@ -251,18 +259,22 @@ RepeatAction:           PUSH    R1
                         CMP     R2, RIGHT
                         JMP.Z   MoveRight
 
-MoveUp:                 SUB     R1, 0100h
+                        ; Decrementa a linha
+MoveUp:                 SUB     R1, CHANGE_ROW
                         MOV     M[ NextPos ], R1
                         JMP     EndRepeatAction
 
-MoveDown:               ADD     R1, 0100h
+                        ; Incrementa a linha
+MoveDown:               ADD     R1, CHANGE_ROW
                         MOV     M[ NextPos ], R1
                         JMP     EndRepeatAction
 
+                        ; Decrementa a coluna
 MoveLeft:               DEC     R1
                         MOV     M[ NextPos ], R1
                         JMP     EndRepeatAction
 
+                        ; Incrementa a coluna
 MoveRight:              INC     R1
                         MOV     M[ NextPos ], R1
 
@@ -304,7 +316,7 @@ StartTimer:             PUSH    R1
 
                         MOV     R1, TIMER_MS
                         MOV     M[ TIMER_INTERVAL ], R1
-                        MOV     R1, 1d
+                        MOV     R1, TRUE
                         MOV     M[ TIMER_START ], R1
 
 StartTimerEnd:          POP     R1
@@ -353,12 +365,14 @@ ImprimeTela:            PUSH    R1
                         PUSH    R3 ; Controla linha
                         PUSH    R4 ; Controla coluna
 
+                        ; Começa na linha 1 para não sobreescrever o header
                         MOV     R3, 1d
                         MOV     R4, 0d
 
 LoopImprimeTela:        CMP     R3, MAX_ROWS
                         JMP.Z   FimImprimeTela
 
+                        ; Verifica se já chegou ao fim do texto
                         MOV		  R1, M[ TextIndex ]
                         MOV		  R1, M[ R1 ]
                         CMP 	  R1, FIM_TEXTO
@@ -373,11 +387,14 @@ LoopImprimeTela:        CMP     R3, MAX_ROWS
 
                         INC		  M[ TextIndex ] ; Muda de caracter
                         INC		  R4 ; Muda de coluna
+
+                        ; Verifica se já chegou ao final da coluna
                         CMP     R4, MAX_COLS
                         JMP.Z   MudaLinha
 
                         JMP     LoopImprimeTela
 
+                        ; Muda de linha
 MudaLinha:              INC     R3
                         MOV     R4, 0d
                         JMP     LoopImprimeTela
@@ -400,9 +417,11 @@ ImprimeHeader:          PUSH    R1
                         MOV     R3, 0d
                         MOV     R4, 0d
 
+                        ; Verifica se já chegou ao final da coluna
 ImprimeHeaderLoop:      CMP     R4, MAX_COLS
                         JMP.Z   FimImprimeHeader
                         
+                        ; Verifica se já chegou ao fim do texto
                         MOV		  R1, M[ TextIndex ]
                         MOV		  R1, M[ R1 ]
                         CMP 	  R1, FIM_TEXTO
@@ -520,7 +539,7 @@ EndBodyColisionLoop:    MOV     R2, M[ TailAddress ]
                         MOV     M[ PosCursor ], R2
                         CALL    ImprimeCaracter
 
-                        ; Anda todo corpo 1 posição
+                        ; Anda todo corpo 1 posição até chegar na cabeça
                         MOV     R2, M[ TailAddress ]
 MoveLoop:               CMP     R2, M[ HeadAddress ]
                         JMP.Z   EndMoveLoop
@@ -554,7 +573,7 @@ EndMove:                POP     R3
                         RET
 
 ;------------------------------------------------------------------------------
-;   Função EatFood
+;   Função EatFood: Aumenta o tamanho da cobra ao comer uma fruta
 ;------------------------------------------------------------------------------
 EatFood:                PUSH    R1
                         PUSH    R2
@@ -565,7 +584,7 @@ EatFood:                PUSH    R1
                         INC     M[ TailAddress ]
                         MOV     R1, M[ TailAddress ]
 
-                        ; Move todo conteudo da lista para endereço a direita
+                        ; Move todo conteudo da lista para endereço a direita até chegar na cabeça
 EatFoodLoop:            CMP     R1, M[ HeadAddress ]
                         JMP.Z   FimEatFoodLoop
 
@@ -604,7 +623,7 @@ End_EatFood:            POP     R4
                         RET
 
 ;------------------------------------------------------------------------------
-;   Função UpdateScore
+;   Função UpdateScore: Incrementa o score e atualiza o scoreboard
 ;------------------------------------------------------------------------------
 UpdateScore:            PUSH    R1
 
@@ -630,30 +649,25 @@ ChangeCentesimal:       MOV     R1, '0'
                         MOV     M[ ScoreD ], R1
                         INC     M[ ScoreC ]
 
-PrintScore:             MOV     R1, 0d
-                        SHL     R1, ROW_SHIFT
-                        OR      R1, 13d
+PrintScore:             MOV     R1, SCORE_U
                         MOV     M[ PosCursor ], R1
                         MOV     R1, M[ ScoreU ]
                         MOV     M[ Caracter ], R1
                         CALL    ImprimeCaracter
 
-                        MOV     R1, 0d
-                        SHL     R1, ROW_SHIFT
-                        OR      R1, 12d
+                        MOV     R1, SCORE_D
                         MOV     M[ PosCursor ], R1
                         MOV     R1, M[ ScoreD ]
                         MOV     M[ Caracter ], R1
                         CALL    ImprimeCaracter
 
-                        MOV     R1, 0d
-                        SHL     R1, ROW_SHIFT
-                        OR      R1, 11d
+                        MOV     R1, SCORE_C
                         MOV     M[ PosCursor ], R1
                         MOV     R1, M[ ScoreC ]
                         MOV     M[ Caracter ], R1
                         CALL    ImprimeCaracter
 
+                        ; Verifica se a pontuação do score é igual a condição de vitoria
                         MOV     R1, M[ Score ]
                         CMP     R1, WIN_CONDITION
                         CALL.Z  WinGame
@@ -662,7 +676,7 @@ PrintScore:             MOV     R1, 0d
                         RET
 
 ;------------------------------------------------------------------------------
-;   Função SpawnFood
+;   Função SpawnFood: Insere a comida no mapa em uma posição gerada aleatoriamente
 ;------------------------------------------------------------------------------
 SpawnFood:              PUSH    R1
                         PUSH    R2 ; FoodRow
@@ -699,6 +713,7 @@ FoodPosLoop:            CMP     R1, M[ HeadAddress ]
                         DEC     R1
                         JMP     FoodPosLoop
 
+                        ; Imprime a comida na nova posição
 EndFoodPosLoop:         MOV     M[ FoodPos ], R2
                         MOV     M[ PosCursor ], R2
                         MOV     R1, FOOD

@@ -14,9 +14,10 @@
 	INTERRUPTOR                      FFF9         CONSTANT
 	GET_ROW                          FF00         CONSTANT
 	GET_COL                          00FF         CONSTANT
+	CHANGE_ROW                       0100         CONSTANT
 	TRUE                             0001         CONSTANT
 	FALSE                            0000         CONSTANT
-	WIN_CONDITION                    0005         CONSTANT
+	WIN_CONDITION                    000F         CONSTANT
 	ROW_POSITION                     0000         CONSTANT
 	COL_POSITION                     0000         CONSTANT
 	ROW_SHIFT                        0008         CONSTANT
@@ -30,6 +31,9 @@
 	WALL_BOTTOM                      1700         CONSTANT
 	WALL_RIGHT                       004F         CONSTANT
 	WALL_LEFT                        0000         CONSTANT
+	SCORE_U                          000D         CONSTANT
+	SCORE_D                          000C         CONSTANT
+	SCORE_C                          000B         CONSTANT
 	SNAKE_INITIAL                    0C28         CONSTANT
 	UP                               0000         CONSTANT
 	LEFT                             0001         CONSTANT
@@ -176,11 +180,11 @@
 	ChangeDecimal                    0150            LABEL
 	ChangeCentesimal                 015E            LABEL
 	PrintScore                       0164            LABEL
-	SpawnFood                        0193            LABEL
-	GenerateFood                     0196            LABEL
-	FoodPosLoop                      01AE            LABEL
-	EndFoodPosLoop                   01B9            LABEL
-	StartGame                        01C7            LABEL
-	Main                             01F9            LABEL
-	Cycle                            0203            LABEL
-	Halt                             0204            LABEL
+	SpawnFood                        018A            LABEL
+	GenerateFood                     018D            LABEL
+	FoodPosLoop                      01A5            LABEL
+	EndFoodPosLoop                   01B0            LABEL
+	StartGame                        01BE            LABEL
+	Main                             01F0            LABEL
+	Cycle                            01FA            LABEL
+	Halt                             01FB            LABEL
