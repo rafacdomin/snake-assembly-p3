@@ -24,7 +24,7 @@
 	COLUMN_SHIFT                     0008         CONSTANT
 	TIMER_START                      FFF7         CONSTANT
 	TIMER_INTERVAL                   FFF6         CONSTANT
-	TIMER_MS                         0003         CONSTANT
+	TIMER_MS                         0001         CONSTANT
 	MAX_ROWS                         0018         CONSTANT
 	MAX_COLS                         0050         CONSTANT
 	WALL_TOP                         0100         CONSTANT
@@ -181,10 +181,10 @@
 	ChangeCentesimal                 015E            LABEL
 	PrintScore                       0164            LABEL
 	SpawnFood                        018A            LABEL
-	GenerateFood                     018D            LABEL
-	FoodPosLoop                      01A5            LABEL
-	EndFoodPosLoop                   01B0            LABEL
-	StartGame                        01BE            LABEL
-	Main                             01F0            LABEL
-	Cycle                            01FA            LABEL
-	Halt                             01FB            LABEL
+	GenerateFood                     018E            LABEL
+	FoodPosLoop                      01CA            LABEL
+	EndFoodPosLoop                   01D5            LABEL
+	StartGame                        01E4            LABEL
+	Main                             0216            LABEL
+	Cycle                            0220            LABEL
+	Halt                             0221            LABEL

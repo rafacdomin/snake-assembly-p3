@@ -27,7 +27,7 @@ COLUMN_SHIFT	          EQU		  8d
 ; Controle do Timer
 TIMER_START             EQU     FFF7h ; Controla o timer, 0 para e 1 inicia
 TIMER_INTERVAL          EQU     FFF6h ; Controla a quantidade de intervalos de 100ms
-TIMER_MS                EQU     3d    ; Quantidade padrão de intervalos
+TIMER_MS                EQU     1d    ; Quantidade padrão de intervalos
 
 MAX_ROWS                EQU     24d
 MAX_COLS                EQU     80d
@@ -681,34 +681,66 @@ PrintScore:             MOV     R1, SCORE_U
 SpawnFood:              PUSH    R1
                         PUSH    R2 ; FoodRow
                         PUSH    R3 ; FoodCol
+                        PUSH    R4
 
                         ; Gera FoodRow
 GenerateFood:           CALL    RandomV1
                         MOV     R1, M[ Random_Var ]
                         MOV     R2, MAX_ROWS
-                        DEC     R2
+                        DEC     R2 ; Linha começa em 0
                         DIV     R1, R2
-                        ADD     R2, 2d
+                        INC     R2 ; Impede que resultado seja zero
+
+                        ; Verifica se não esta fora do mapa
+                        MOV     R1, R2
+                        MOV     R4, MAX_ROWS
+                        DIV     R1, R4
+                        CMP     R1, 0d ; Maior que zero ultrapassou a parede
+                        JMP.NZ  GenerateFood
 
                         ; Gera FoodCol
                         CALL    RandomV1
                         MOV     R1, M[ Random_Var ]
                         MOV     R3, MAX_COLS
-                        DEC     R3
+                        DEC     R3 
                         DIV     R1, R3
-                        ADD     R3, 1d
+                        INC     R3
+
+                        ; Verifica se não esta fora do mapa
+                        MOV     R1, R3
+                        MOV     R4, MAX_COLS
+                        DIV     R1, R4
+                        CMP     R1, 0d ; Maior que zero ultrapassou a parede
+                        JMP.NZ  GenerateFood
 
                         SHL     R2, ROW_SHIFT
                         OR      R2, R3
 
+                        ; Verifica spawn nas paredes
+                        MOV     R1, R2
+                        AND     R1, GET_ROW
+                        CMP     R1, WALL_TOP
+                        JMP.Z   GenerateFood
+
+                        CMP     R1, WALL_BOTTOM
+                        JMP.Z   GenerateFood
+
+                        MOV     R1, R2
+                        AND     R1, GET_COL
+                        CMP     R1, WALL_LEFT
+                        JMP.Z   GenerateFood
+
+                        CMP     R1, WALL_RIGHT
+                        JMP.Z   GenerateFood
+
                         ; Verifica se a comida não vai spawnar na mesma posição da cobra
                         MOV     R1, M[ TailAddress ]
-FoodPosLoop:            CMP     R1, M[ HeadAddress ]
-                        JMP.Z   EndFoodPosLoop
-
-                        MOV     R3, M[ R1 ]
+FoodPosLoop:            MOV     R3, M[ R1 ]
                         CMP     R3, R2
                         JMP.Z   GenerateFood
+
+                        CMP     R1, M[ HeadAddress ]
+                        JMP.Z   EndFoodPosLoop
 
                         DEC     R1
                         JMP     FoodPosLoop
@@ -720,6 +752,7 @@ EndFoodPosLoop:         MOV     M[ FoodPos ], R2
                         MOV     M[ Caracter ], R1
                         CALL    ImprimeCaracter
 
+                        POP     R4
                         POP     R3
                         POP     R2
                         POP     R1
