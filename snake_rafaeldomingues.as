@@ -681,7 +681,6 @@ PrintScore:             MOV     R1, SCORE_U
 SpawnFood:              PUSH    R1
                         PUSH    R2 ; FoodRow
                         PUSH    R3 ; FoodCol
-                        PUSH    R4
 
                         ; Gera FoodRow
 GenerateFood:           CALL    RandomV1
@@ -691,13 +690,6 @@ GenerateFood:           CALL    RandomV1
                         DIV     R1, R2
                         INC     R2 ; Impede que resultado seja zero
 
-                        ; Verifica se não esta fora do mapa
-                        MOV     R1, R2
-                        MOV     R4, MAX_ROWS
-                        DIV     R1, R4
-                        CMP     R1, 0d ; Maior que zero ultrapassou a parede
-                        JMP.NZ  GenerateFood
-
                         ; Gera FoodCol
                         CALL    RandomV1
                         MOV     R1, M[ Random_Var ]
@@ -705,13 +697,6 @@ GenerateFood:           CALL    RandomV1
                         DEC     R3 
                         DIV     R1, R3
                         INC     R3
-
-                        ; Verifica se não esta fora do mapa
-                        MOV     R1, R3
-                        MOV     R4, MAX_COLS
-                        DIV     R1, R4
-                        CMP     R1, 0d ; Maior que zero ultrapassou a parede
-                        JMP.NZ  GenerateFood
 
                         SHL     R2, ROW_SHIFT
                         OR      R2, R3
@@ -752,7 +737,6 @@ EndFoodPosLoop:         MOV     M[ FoodPos ], R2
                         MOV     M[ Caracter ], R1
                         CALL    ImprimeCaracter
 
-                        POP     R4
                         POP     R3
                         POP     R2
                         POP     R1

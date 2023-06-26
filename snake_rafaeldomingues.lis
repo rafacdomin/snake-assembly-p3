@@ -181,10 +181,10 @@
 	ChangeCentesimal                 015E            LABEL
 	PrintScore                       0164            LABEL
 	SpawnFood                        018A            LABEL
-	GenerateFood                     018E            LABEL
-	FoodPosLoop                      01CA            LABEL
-	EndFoodPosLoop                   01D5            LABEL
-	StartGame                        01E4            LABEL
-	Main                             0216            LABEL
-	Cycle                            0220            LABEL
-	Halt                             0221            LABEL
+	GenerateFood                     018D            LABEL
+	FoodPosLoop                      01B9            LABEL
+	EndFoodPosLoop                   01C4            LABEL
+	StartGame                        01D2            LABEL
+	Main                             0204            LABEL
+	Cycle                            020E            LABEL
+	Halt                             020F            LABEL
